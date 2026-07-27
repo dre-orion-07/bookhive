@@ -14,7 +14,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@prisma/client": "^7.9.0",
+    "@prisma/client": "^6.19.3",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
@@ -33,7 +33,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.13.3",
-    "prisma": "^7.9.0",
+    "prisma": "^6.19.3",
     "tsx": "^4.23.1",
     "typescript": "~6.0.3"
   }
