@@ -2,6 +2,7 @@ import express, { type Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
+import { errorMiddleware } from "./shared/errors/error.middleware.js";
 
 const app: Application = express();
 
@@ -19,5 +20,7 @@ app.get("/api/v1/health", (_req, res) => {
     },
   });
 });
+
+app.use(errorMiddleware);
 
 export default app;
