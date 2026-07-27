@@ -1,0 +1,17 @@
+{
+  "name": "bookhive",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered social reading platform",
+  "scripts": {
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
