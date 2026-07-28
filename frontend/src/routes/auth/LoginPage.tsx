@@ -1,9 +1,9 @@
-function App() {
+function LoginPage() {
   return (
     <div className="min-h-screen bg-(--color-background) text-white flex items-center justify-center">
-      <h1 className="text-2xl font-sans">BookHive — Foundation Ready</h1>
+      <h1 className="text-2xl font-sans">Login Page</h1>
     </div>
   );
 }
 
-export default App;
+export default LoginPage;
