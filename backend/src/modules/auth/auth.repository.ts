@@ -23,4 +23,17 @@ export const authRepository = {
   }) => {
     return prisma.user.create({ data });
   },
+  findByGoogleId: (googleId: string) => {
+    return prisma.user.findUnique({ where: { googleId } });
+  },
+
+  createFromGoogle: (data: {
+    email: string;
+    googleId: string;
+    username: string;
+    displayName: string;
+    avatar?: string;
+  }) => {
+    return prisma.user.create({ data });
+  },
 };
