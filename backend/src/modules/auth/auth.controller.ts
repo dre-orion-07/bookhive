@@ -2,7 +2,12 @@ import type { Request, Response, NextFunction } from "express";
 import { authService } from "./auth.service.js";
 import { sendSuccess } from "../../shared/responses/ApiResponse.js";
 import type { AuthenticatedRequest } from "../../shared/middleware/authenticate.js";
-import type { RegisterInput, LoginInput, GoogleAuthInput } from "./auth.schema.js";
+import type {
+  RegisterInput,
+  LoginInput,
+  GoogleAuthInput,
+  RefreshTokenInput,
+} from "./auth.schema.js";
 
 export const authController = {
   register: async (req: Request, res: Response, next: NextFunction) => {
@@ -37,6 +42,16 @@ export const authController = {
       const { idToken } = req.body as GoogleAuthInput;
       const result = await authService.googleAuth(idToken);
       return sendSuccess(res, result, "Signed in with Google successfully.");
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  refresh: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { refreshToken } = req.body as RefreshTokenInput;
+      const result = await authService.refreshAccessToken(refreshToken);
+      return sendSuccess(res, result, "Token refreshed successfully.");
     } catch (err) {
       return next(err);
     }

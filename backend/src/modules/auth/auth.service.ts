@@ -1,10 +1,10 @@
 import { authRepository } from "./auth.repository.js";
 import { hashPassword, comparePassword } from "../../shared/hashing/password.js";
-import { signAccessToken, signRefreshToken } from "../../shared/jwt/jwt.js";
 import { ErrorFactory } from "../../shared/errors/ErrorFactory.js";
 import type { RegisterInput, LoginInput } from "./auth.schema.js";
 import { OAuth2Client } from "google-auth-library";
 import { env } from "../../config/env.js";
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../../shared/jwt/jwt.js";
 
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
 
@@ -130,6 +130,23 @@ export const authService = {
       },
       accessToken,
       refreshToken,
+    };
+  },
+
+  refreshAccessToken: async (refreshToken: string) => {
+    const payload = verifyRefreshToken(refreshToken);
+
+    const user = await authRepository.findById(payload.userId);
+    if (!user) {
+      throw ErrorFactory.userNotFound();
+    }
+
+    const accessToken = signAccessToken({ userId: user.id, email: user.email });
+    const newRefreshToken = signRefreshToken({ userId: user.id });
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
     };
   },
 };

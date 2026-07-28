@@ -29,3 +29,9 @@ export const googleAuthSchema = z.object({
 });
 
 export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;
+
+export const refreshTokenSchema = z.object({
+  refreshToken: z.string().min(1, "Refresh token is required."),
+});
+
+export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
