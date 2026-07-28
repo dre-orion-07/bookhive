@@ -66,4 +66,16 @@ export const authService = {
       refreshToken,
     };
   },
+  getCurrentUser: async (userId: string) => {
+    const user = await authRepository.findById(userId);
+    if (!user) {
+      throw ErrorFactory.userNotFound();
+    }
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      displayName: user.displayName,
+    };
+  },
 };

@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { authService } from "./auth.service.js";
 import { sendSuccess } from "../../shared/responses/ApiResponse.js";
 import type { RegisterInput, LoginInput } from "./auth.schema.js";
+import type { AuthenticatedRequest } from "../../shared/middleware/authenticate.js";
 
 export const authController = {
   register: async (req: Request, res: Response, next: NextFunction) => {
@@ -9,7 +10,7 @@ export const authController = {
       const result = await authService.register(req.body as RegisterInput);
       return sendSuccess(res, result, "Account created successfully.", 201);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   },
 
@@ -18,7 +19,16 @@ export const authController = {
       const result = await authService.login(req.body as LoginInput);
       return sendSuccess(res, result, "Logged in successfully.");
     } catch (err) {
-      next(err);
+      return next(err);
+    }
+  },
+
+  me: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const user = await authService.getCurrentUser(req.user!.userId);
+      return sendSuccess(res, user, "Current user retrieved successfully.");
+    } catch (err) {
+      return next(err);
     }
   },
 };
