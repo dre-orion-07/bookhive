@@ -8,6 +8,8 @@ import {
 } from "../../modules/auth/schemas/auth.schema";
 import { authService } from "../../modules/auth/services/auth.service";
 import { useAuthStore } from "../../shared/stores/authStore";
+import { useCallback } from "react";
+import { useGoogleSignIn } from "../../shared/hooks/useGoogleSignIn";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -41,6 +43,22 @@ function RegisterPage() {
       setIsSubmitting(false);
     }
   };
+
+  const handleGoogleToken = useCallback(
+    async (idToken: string) => {
+      setServerError(null);
+      try {
+        const result = await authService.googleAuth(idToken);
+        setAuth(result.user, result.accessToken, result.refreshToken);
+        navigate("/dashboard");
+      } catch {
+        setServerError("Google sign-in failed. Please try again.");
+      }
+    },
+    [navigate, setAuth]
+  );
+
+  useGoogleSignIn("google-signup-btn", handleGoogleToken);
 
   return (
     <div className="min-h-screen bg-(--color-background) flex items-center justify-center px-4 py-8">
@@ -136,6 +154,14 @@ function RegisterPage() {
             {isSubmitting ? "Creating account..." : "Sign Up"}
           </button>
         </form>
+
+        <div className="flex items-center gap-3 my-6">
+          <div className="flex-1 h-px bg-(--color-border)" />
+          <span className="text-xs text-gray-500">or continue with</span>
+          <div className="flex-1 h-px bg-(--color-border)" />
+        </div>
+
+        <div id="google-signup-btn" className="flex justify-center" />
 
         <p className="mt-6 text-center text-sm text-gray-400">
           Already have an account?{" "}
