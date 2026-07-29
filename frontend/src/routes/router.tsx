@@ -3,6 +3,7 @@ import LandingPage from "./landing/LandingPage";
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import DashboardPage from "./dashboard/DashboardPage";
+import ProtectedRoute from "../shared/components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <DashboardPage />,
+    element: (
+      <ProtectedRoute>
+        <DashboardPage />
+      </ProtectedRoute>
+    ),
   },
 ]);
