@@ -1,6 +1,7 @@
 import { usersRepository } from "./users.repository.js";
 import { ErrorFactory } from "../../shared/errors/ErrorFactory.js";
 import type { UpdateProfileInput } from "./users.schema.js";
+import { storageProvider } from "../../providers/storage/cloudinary.provider.js";
 
 function toPublicUser(user: {
   id: string;
@@ -38,6 +39,12 @@ export const usersService = {
     if (!user) {
       throw ErrorFactory.userNotFound();
     }
+    return toPublicUser(user);
+  },
+
+  uploadAvatar: async (id: string, fileBuffer: Buffer) => {
+    const avatarUrl = await storageProvider.uploadImage(fileBuffer, "avatars");
+    const user = await usersRepository.update(id, { avatar: avatarUrl });
     return toPublicUser(user);
   },
 
