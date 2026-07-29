@@ -4,6 +4,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from "./shared/errors/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
+import usersRoutes from "./modules/users/users.routes.js";
 
 const app: Application = express();
 
@@ -23,6 +24,7 @@ app.get("/api/v1/health", (_req, res) => {
 });
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", usersRoutes);
 
 app.use(errorMiddleware);
 
