@@ -25,3 +25,33 @@ model User {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model Book {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  googleBooksId   String?
+  openLibraryId   String?
+  isbn10          String?
+  isbn13          String?
+  title           String
+  subtitle        String?
+  authors         String[]
+  description     String?
+  categories      String[]
+  publisher       String?
+  publishedDate   String?
+  language        String?
+  pageCount       Int?
+  thumbnail       String?
+  averageRating   Float?
+  ratingsCount    Int?
+  previewLink     String?
+  infoLink        String?
+  sourceProvider  String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([title])
+  @@index([authors])
+  @@index([googleBooksId])
+  @@index([isbn13])
+}
