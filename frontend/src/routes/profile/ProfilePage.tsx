@@ -31,6 +31,7 @@ function ProfilePage() {
     reset,
   } = useForm<EditProfileFormValues>({
     resolver: zodResolver(editProfileSchema as never),
+
     values: profile
       ? {
           displayName: profile.displayName,
@@ -39,6 +40,7 @@ function ProfilePage() {
           website: profile.website ?? "",
           favouriteGenres: profile.favouriteGenres.join(", "),
           readingGoal: profile.readingGoal ?? undefined,
+          isPrivateProfile: profile.isPrivateProfile,
         }
       : undefined,
   });
@@ -71,6 +73,7 @@ function ProfilePage() {
             .filter(Boolean)
         : [],
       readingGoal: values.readingGoal,
+      isPrivateProfile: values.isPrivateProfile,
     });
   };
 
@@ -207,6 +210,20 @@ function ProfilePage() {
               {errors.readingGoal && (
                 <p className="mt-1 text-xs text-red-400">{errors.readingGoal.message}</p>
               )}
+            </div>
+
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <label className="text-sm text-gray-300">Private Profile</label>
+                <p className="text-xs text-gray-500">
+                  Only followers can see your activity and library
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                {...register("isPrivateProfile")}
+                className="w-5 h-5 accent-(--color-primary)"
+              />
             </div>
 
             <button

@@ -7,6 +7,7 @@ export const editProfileSchema = z.object({
   website: z.string().url("Please provide a valid URL.").optional().or(z.literal("")),
   favouriteGenres: z.string().optional(),
   readingGoal: z.coerce.number().int().min(1).max(1000).optional(),
+  isPrivateProfile: z.boolean().optional(),
 });
 
 export type EditProfileFormValues = z.infer<typeof editProfileSchema>;
