@@ -30,4 +30,7 @@ export const ErrorFactory = {
 
   bookNotFound: (message = "Book not found.") =>
     new AppError(message, 404, ErrorCodes.BOOK_NOT_FOUND),
+
+  bookshelfNotFound: (message = "Bookshelf not found.") =>
+    new AppError(message, 404, ErrorCodes.BOOKSHELF_NOT_FOUND),
 };
