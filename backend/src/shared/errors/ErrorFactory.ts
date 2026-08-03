@@ -27,4 +27,7 @@ export const ErrorFactory = {
 
   internal: (message = "Something went wrong. Please try again.") =>
     new AppError(message, 500, ErrorCodes.INTERNAL_ERROR),
+
+  bookNotFound: (message = "Book not found.") =>
+    new AppError(message, 404, ErrorCodes.BOOK_NOT_FOUND),
 };
