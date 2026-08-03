@@ -7,6 +7,7 @@ import ProtectedRoute from "../shared/components/ProtectedRoute";
 import ProfilePage from "./profile/ProfilePage";
 import SearchPage from "./books/SearchPage";
 import BookDetailPage from "./books/BookDetailPage";
+import LibraryPage from "./library/LibraryPage";
 
 export const router = createBrowserRouter([
   {
@@ -47,5 +48,14 @@ export const router = createBrowserRouter([
   {
     path: "/books/:id",
     element: <BookDetailPage />,
+  },
+
+  {
+    path: "/library",
+    element: (
+      <ProtectedRoute>
+        <LibraryPage />
+      </ProtectedRoute>
+    ),
   },
 ]);

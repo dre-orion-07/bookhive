@@ -35,6 +35,13 @@ export const libraryService = {
     }
   },
 
+  getHistory: async (): Promise<ReadingProgress[]> => {
+    const response = await apiClient.get<ApiSuccessResponse<ReadingProgress[]>>(
+      "/reading-progress/history"
+    );
+    return response.data.data;
+  },
+
   updateProgress: async (
     bookId: string,
     payload: UpdateProgressPayload
