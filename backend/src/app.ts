@@ -7,6 +7,7 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import usersRoutes from "./modules/users/users.routes.js";
 import booksRoutes from "./modules/books/books.routes.js";
 import libraryRoutes from "./modules/library/library.routes.js";
+import readingProgressRoutes from "./modules/reading-progress/reading-progress.routes.js";
 
 const app: Application = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1/books", booksRoutes);
 app.use("/api/v1/library", libraryRoutes);
+app.use("/api/v1/reading-progress", readingProgressRoutes);
 
 app.get("/api/v1/health", (_req, res) => {
   res.status(200).json({
