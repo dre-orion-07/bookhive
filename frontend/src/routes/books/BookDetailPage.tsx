@@ -1,9 +1,22 @@
 import { useParams } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { booksService } from "../../modules/books/services/books.service";
+import { libraryService } from "../../modules/library/services/library.service";
+import { useAuthStore } from "../../shared/stores/authStore";
+import type { ReadingProgress } from "../../modules/library/types/library.types";
+
+const STATUS_LABELS: Record<ReadingProgress["status"], string> = {
+  want_to_read: "Want to Read",
+  currently_reading: "Currently Reading",
+  completed: "Completed",
+  dropped: "Dropped",
+  paused: "Paused",
+};
 
 function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const currentUser = useAuthStore((state) => state.user);
+  const queryClient = useQueryClient();
 
   const {
     data: book,
@@ -13,6 +26,42 @@ function BookDetailPage() {
     queryKey: ["books", id],
     queryFn: () => booksService.getById(id!),
     enabled: !!id,
+  });
+
+  const { data: library } = useQuery({
+    queryKey: ["library"],
+    queryFn: libraryService.getLibrary,
+    enabled: !!currentUser,
+  });
+
+  const { data: progress } = useQuery({
+    queryKey: ["reading-progress", id],
+    queryFn: () => libraryService.getProgress(id!),
+    enabled: !!id && !!currentUser,
+  });
+
+  const isInLibrary = library?.some((entry) => entry.bookId === id) ?? false;
+
+  const addMutation = useMutation({
+    mutationFn: () => libraryService.addBook(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["library"] });
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: () => libraryService.removeBook(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["library"] });
+    },
+  });
+
+  const progressMutation = useMutation({
+    mutationFn: (status: ReadingProgress["status"]) =>
+      libraryService.updateProgress(id!, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reading-progress", id] });
+    },
   });
 
   if (isLoading) {
@@ -94,9 +143,39 @@ function BookDetailPage() {
               )}
             </div>
 
-            <button className="rounded-lg bg-(--color-primary) hover:opacity-90 text-white font-medium px-6 py-2.5 transition">
-              Add to Library
-            </button>
+            {currentUser ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => (isInLibrary ? removeMutation.mutate() : addMutation.mutate())}
+                  disabled={addMutation.isPending || removeMutation.isPending}
+                  className={
+                    isInLibrary
+                      ? "rounded-lg border border-(--color-border) hover:bg-(--color-border) text-white font-medium px-6 py-2.5 transition disabled:opacity-50"
+                      : "rounded-lg bg-(--color-primary) hover:opacity-90 text-white font-medium px-6 py-2.5 transition disabled:opacity-50"
+                  }
+                >
+                  {isInLibrary ? "Remove from Library" : "Add to Library"}
+                </button>
+
+                {isInLibrary && (
+                  <select
+                    value={progress?.status ?? "want_to_read"}
+                    onChange={(e) =>
+                      progressMutation.mutate(e.target.value as ReadingProgress["status"])
+                    }
+                    className="rounded-lg bg-(--color-background) border border-(--color-border) px-3 py-2.5 text-white text-sm focus:outline-none focus:border-(--color-primary)"
+                  >
+                    {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Sign in to add this book to your library.</p>
+            )}
           </div>
         </div>
 
