@@ -5,6 +5,7 @@ import RegisterPage from "./auth/RegisterPage";
 import DashboardPage from "./dashboard/DashboardPage";
 import ProtectedRoute from "../shared/components/ProtectedRoute";
 import ProfilePage from "./profile/ProfilePage";
+import SearchPage from "./books/SearchPage";
 
 export const router = createBrowserRouter([
   {
@@ -35,5 +36,10 @@ export const router = createBrowserRouter([
         <ProfilePage />
       </ProtectedRoute>
     ),
+  },
+
+  {
+    path: "/search",
+    element: <SearchPage />,
   },
 ]);
