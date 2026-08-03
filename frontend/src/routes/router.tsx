@@ -6,6 +6,7 @@ import DashboardPage from "./dashboard/DashboardPage";
 import ProtectedRoute from "../shared/components/ProtectedRoute";
 import ProfilePage from "./profile/ProfilePage";
 import SearchPage from "./books/SearchPage";
+import BookDetailPage from "./books/BookDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -41,5 +42,10 @@ export const router = createBrowserRouter([
   {
     path: "/search",
     element: <SearchPage />,
+  },
+
+  {
+    path: "/books/:id",
+    element: <BookDetailPage />,
   },
 ]);

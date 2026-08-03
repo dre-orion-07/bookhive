@@ -45,7 +45,17 @@ function SearchPage() {
           </div>
         </form>
 
-        {isLoading && <p className="text-gray-400">Searching...</p>}
+        {isLoading && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="flex flex-col gap-2 animate-pulse">
+                <div className="aspect-[2/3] rounded-lg bg-(--color-surface) border border-(--color-border)" />
+                <div className="h-4 w-full rounded bg-(--color-surface)" />
+                <div className="h-3 w-2/3 rounded bg-(--color-surface)" />
+              </div>
+            ))}
+          </div>
+        )}
         {isError && <p className="text-red-400">Something went wrong. Please try again.</p>}
 
         {books && books.length === 0 && (
