@@ -13,8 +13,8 @@ export interface NormalizedBook {
   language?: string;
   pageCount?: number;
   thumbnail?: string;
-  averageRating?: number;
-  ratingsCount?: number;
+  providerAverageRating?: number;
+  providerRatingsCount?: number;
   previewLink?: string;
   infoLink?: string;
   sourceProvider: string;

@@ -42,8 +42,10 @@ model Book {
   language        String?
   pageCount       Int?
   thumbnail       String?
-  averageRating   Float?
-  ratingsCount    Int?
+  providerAverageRating Float?
+providerRatingsCount  Int?
+communityAverageRating Float?
+communityRatingsCount  Int  @default(0)
   previewLink     String?
   infoLink        String?
   sourceProvider  String
@@ -95,5 +97,21 @@ model Bookshelf {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([userId])
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  bookId    String   @db.ObjectId
+  rating    Int
+  title     String?
+  content   String
+  likedBy   String[] @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, bookId])
+  @@index([bookId])
   @@index([userId])
 }

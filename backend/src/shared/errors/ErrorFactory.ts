@@ -33,4 +33,7 @@ export const ErrorFactory = {
 
   bookshelfNotFound: (message = "Bookshelf not found.") =>
     new AppError(message, 404, ErrorCodes.BOOKSHELF_NOT_FOUND),
+
+  reviewNotFound: (message = "Review not found.") =>
+    new AppError(message, 404, ErrorCodes.REVIEW_NOT_FOUND),
 };
