@@ -8,6 +8,8 @@ import ProfilePage from "./profile/ProfilePage";
 import SearchPage from "./books/SearchPage";
 import BookDetailPage from "./books/BookDetailPage";
 import LibraryPage from "./library/LibraryPage";
+import BookshelvesPage from "./bookshelves/BookshelvesPage";
+import BookshelfDetailPage from "./bookshelves/BookshelfDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +57,24 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <LibraryPage />
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/bookshelves",
+    element: (
+      <ProtectedRoute>
+        <BookshelvesPage />
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/bookshelves/:id",
+    element: (
+      <ProtectedRoute>
+        <BookshelfDetailPage />
       </ProtectedRoute>
     ),
   },

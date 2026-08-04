@@ -4,6 +4,8 @@ import { booksService } from "../../modules/books/services/books.service";
 import { libraryService } from "../../modules/library/services/library.service";
 import { useAuthStore } from "../../shared/stores/authStore";
 import type { ReadingProgress } from "../../modules/library/types/library.types";
+import { useState } from "react";
+import { bookshelvesService } from "../../modules/bookshelves/services/bookshelves.service";
 
 const STATUS_LABELS: Record<ReadingProgress["status"], string> = {
   want_to_read: "Want to Read",
@@ -61,6 +63,22 @@ function BookDetailPage() {
       libraryService.updateProgress(id!, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reading-progress", id] });
+    },
+  });
+
+  const [showShelfMenu, setShowShelfMenu] = useState(false);
+
+  const { data: shelves } = useQuery({
+    queryKey: ["bookshelves"],
+    queryFn: bookshelvesService.list,
+    enabled: !!currentUser,
+  });
+
+  const addToShelfMutation = useMutation({
+    mutationFn: (shelfId: string) => bookshelvesService.addBook(shelfId, id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bookshelves"] });
+      setShowShelfMenu(false);
     },
   });
 
@@ -178,6 +196,35 @@ function BookDetailPage() {
             )}
           </div>
         </div>
+
+        {isInLibrary && shelves && shelves.length > 0 && (
+          <div className="relative">
+            <button
+              onClick={() => setShowShelfMenu(!showShelfMenu)}
+              className="rounded-lg border border-(--color-border) hover:bg-(--color-border) text-white text-sm font-medium px-4 py-2.5 transition"
+            >
+              + Add to Shelf
+            </button>
+            {showShelfMenu && (
+              <div className="absolute top-full mt-2 left-0 bg-(--color-surface) border border-(--color-border) rounded-lg shadow-lg py-2 min-w-48 z-10">
+                {shelves.map((shelf) => (
+                  <button
+                    key={shelf.id}
+                    onClick={() => addToShelfMutation.mutate(shelf.id)}
+                    disabled={shelf.bookIds.includes(id!)}
+                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-(--color-background) disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    <span>{shelf.icon ?? "📚"}</span>
+                    <span>{shelf.name}</span>
+                    {shelf.bookIds.includes(id!) && (
+                      <span className="text-xs text-gray-500 ml-auto">Added</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {book.description && (
           <div className="mt-8 pt-6 border-t border-(--color-border)">
