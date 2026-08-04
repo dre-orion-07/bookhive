@@ -6,6 +6,8 @@ import { useAuthStore } from "../../shared/stores/authStore";
 import type { ReadingProgress } from "../../modules/library/types/library.types";
 import { useState } from "react";
 import { bookshelvesService } from "../../modules/bookshelves/services/bookshelves.service";
+import { reviewsService } from "../../modules/reviews/services/reviews.service";
+import type { Review } from "../../modules/reviews/types/review.types";
 
 const STATUS_LABELS: Record<ReadingProgress["status"], string> = {
   want_to_read: "Want to Read",
@@ -81,6 +83,51 @@ function BookDetailPage() {
       setShowShelfMenu(false);
     },
   });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewContent, setReviewContent] = useState("");
+
+  const { data: reviews } = useQuery({
+    queryKey: ["reviews", id],
+    queryFn: () => reviewsService.listForBook(id!),
+    enabled: !!id,
+  });
+
+  const myReview = reviews?.find((r) => r.userId === currentUser?.id);
+
+  const createReviewMutation = useMutation({
+    mutationFn: () =>
+      reviewsService.create({
+        bookId: id!,
+        rating: reviewRating,
+        title: reviewTitle || undefined,
+        content: reviewContent,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["books", id] });
+      setShowReviewForm(false);
+      setReviewTitle("");
+      setReviewContent("");
+      setReviewRating(5);
+    },
+  });
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: (reviewId: string) => reviewsService.delete(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["books", id] });
+    },
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: (reviewId: string) => reviewsService.toggleLike(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -153,10 +200,16 @@ function BookDetailPage() {
             <div className="flex gap-4 text-sm text-gray-400 mb-4">
               {book.publishedDate && <span>{book.publishedDate}</span>}
               {book.pageCount && <span>{book.pageCount} pages</span>}
-              {book.averageRating && (
+              {book.communityAverageRating !== null && (
                 <span>
-                  ★ {book.averageRating.toFixed(1)}
-                  {book.ratingsCount && ` (${book.ratingsCount})`}
+                  ★ {book.communityAverageRating.toFixed(1)} ({book.communityRatingsCount} community
+                  {book.communityRatingsCount === 1 ? " rating" : " ratings"})
+                </span>
+              )}
+              {book.communityAverageRating === null && book.providerAverageRating !== null && (
+                <span>
+                  ★ {book.providerAverageRating.toFixed(1)}
+                  {book.providerRatingsCount && ` (${book.providerRatingsCount})`}
                 </span>
               )}
             </div>
@@ -232,6 +285,113 @@ function BookDetailPage() {
             <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
               {book.description}
             </p>
+          </div>
+        )}
+      </div>
+      <div className="mt-8 pt-6 border-t border-(--color-border)">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm uppercase tracking-wide text-gray-500">
+            Reviews {reviews && `(${reviews.length})`}
+          </h2>
+          {currentUser && !myReview && (
+            <button
+              onClick={() => setShowReviewForm(!showReviewForm)}
+              className="text-sm text-(--color-primary) hover:underline"
+            >
+              {showReviewForm ? "Cancel" : "Write a Review"}
+            </button>
+          )}
+        </div>
+
+        {showReviewForm && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              createReviewMutation.mutate();
+            }}
+            className="mb-6 bg-(--color-background) border border-(--color-border) rounded-xl p-4 space-y-3"
+          >
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Rating</label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className={
+                      star <= reviewRating
+                        ? "text-(--color-accent) text-xl"
+                        : "text-gray-600 text-xl"
+                    }
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+            </div>
+            <input
+              type="text"
+              value={reviewTitle}
+              onChange={(e) => setReviewTitle(e.target.value)}
+              placeholder="Title (optional)"
+              className="w-full rounded-lg bg-(--color-surface) border border-(--color-border) px-3 py-2 text-white text-sm focus:outline-none focus:border-(--color-primary)"
+            />
+            <textarea
+              value={reviewContent}
+              onChange={(e) => setReviewContent(e.target.value)}
+              placeholder="Share your thoughts..."
+              rows={4}
+              required
+              className="w-full rounded-lg bg-(--color-surface) border border-(--color-border) px-3 py-2 text-white text-sm focus:outline-none focus:border-(--color-primary)"
+            />
+            <button
+              type="submit"
+              disabled={createReviewMutation.isPending || !reviewContent.trim()}
+              className="rounded-lg bg-(--color-primary) hover:opacity-90 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 transition"
+            >
+              {createReviewMutation.isPending ? "Posting..." : "Post Review"}
+            </button>
+          </form>
+        )}
+
+        {reviews && reviews.length === 0 && (
+          <p className="text-gray-500 text-sm">
+            No reviews yet. Be the first to share your thoughts.
+          </p>
+        )}
+
+        {reviews && reviews.length > 0 && (
+          <div className="space-y-4">
+            {reviews.map((review: Review) => (
+              <div key={review.id} className="border-b border-(--color-border) pb-4 last:border-0">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex text-(--color-accent) text-sm">
+                    {"★".repeat(review.rating)}
+                    <span className="text-gray-700">{"★".repeat(5 - review.rating)}</span>
+                  </div>
+                  {review.userId === currentUser?.id && (
+                    <button
+                      onClick={() => deleteReviewMutation.mutate(review.id)}
+                      className="text-xs text-red-400 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+                {review.title && (
+                  <p className="text-white font-medium text-sm mb-1">{review.title}</p>
+                )}
+                <p className="text-gray-300 text-sm mb-2">{review.content}</p>
+                <button
+                  onClick={() => likeMutation.mutate(review.id)}
+                  disabled={!currentUser}
+                  className="text-xs text-gray-500 hover:text-(--color-primary) disabled:hover:text-gray-500 disabled:cursor-not-allowed"
+                >
+                  👍 {review.likedBy.length > 0 && review.likedBy.length}
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>

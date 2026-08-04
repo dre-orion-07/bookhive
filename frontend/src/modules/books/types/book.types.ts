@@ -14,8 +14,10 @@ export interface Book {
   language: string | null;
   pageCount: number | null;
   thumbnail: string | null;
-  averageRating: number | null;
-  ratingsCount: number | null;
+  providerAverageRating: number | null;
+  providerRatingsCount: number | null;
+  communityAverageRating: number | null;
+  communityRatingsCount: number;
   previewLink: string | null;
   infoLink: string | null;
   sourceProvider: string;
