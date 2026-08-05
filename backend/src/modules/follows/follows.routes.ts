@@ -10,5 +10,6 @@ router.post("/:userId", followsController.follow);
 router.delete("/:userId", followsController.unfollow);
 router.get("/followers", followsController.getFollowers);
 router.get("/following", followsController.getFollowing);
+router.get("/discover", followsController.discoverReaders);
 
 export default router;

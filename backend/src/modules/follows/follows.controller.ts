@@ -15,6 +15,15 @@ export const followsController = {
     }
   },
 
+  discoverReaders: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const readers = await followsService.discoverReaders(req.user!.userId);
+      return sendSuccess(res, readers, "Readers discovered successfully.");
+    } catch (err) {
+      return next(err);
+    }
+  },
+
   unfollow: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
