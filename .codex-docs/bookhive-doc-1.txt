@@ -1,0 +1,941 @@
+# BookHive Documentation
+**Version:** 1.0.0 **Status:** Active **Last Updated:** TBD **Project:** BookHive ­ AI-Powered Social Reading Platform
+---
+# Overview
+Welcome to the official documentation for **BookHive**.
+BookHive is an AI-powered social reading platform designed to help readers discover books, organise their reading journey, connect with like-minded readers, and participate in live discussions through intelligent recommendations and real-time communities.
+This documentation serves as the **single source of truth** for the entire project.
+Every engineer, contributor, and AI coding assistant working on BookHive must follow the standards, architecture, and engineering principles defined here.
+No implementation should contradict the documentation unless the documentation is updated through an approved architectural decision.
+---
+# Documentation Principles
+The documentation aims to ensure the project remains:
+- Scalable - Maintainable - Secure - Testable - Well documented - Consistent - Production-ready
+---
+# Technology Stack
+## Frontend
+
+- React 19 - TypeScript - Vite - React Router v7 - Tailwind CSS - Zustand - TanStack Query - Framer Motion
+## Backend
+- Node.js - Express.js - TypeScript - Prisma ORM - MongoDB Atlas - JWT Authentication - Google OAuth - Socket.IO - Zod
+## AI
+- Grok API - AI Provider Abstraction Layer
+## Real-Time Communication
+- Socket.IO - WebRTC
+## Storage
+- Cloudinary
+## Package Manager
+BookHive uses **pnpm** exclusively.
+No npm commands should appear anywhere in the project.
+---
+
+# Documentation Structure
+| Document | Purpose | |-----------|---------| | AGENTS.md | Instructions for AI coding assistants | | 01-project-constitution.md | Core engineering principles and project vision | | 02-engineering-standards.md | Engineering standards and best practices | | 03-software-requirements-specification.md | Functional and non-functional requirements | | 04-software-architecture.md | High-level system architecture | | 05-project-structure.md | Folder structure and project organisation | | 06-database-design.md | Database models and relationships | | 07-api-specification.md | REST API documentation | | 08-user-flow.md | Complete application user journeys | | 09-ui-design-system.md | Design language and component system | | 10-ai-engine-design.md | AI recommendation architecture | | 11-real-time-communication.md | Chat and video architecture | | 12-development-roadmap.md | Project milestones and delivery phases | | 13-security-guidelines.md | Security standards | | 14-testing-strategy.md | Testing philosophy and practices | | 15-git-workflow.md | Git strategy and contribution workflow | | 16-definition-of-done.md | Completion criteria for all work | | 17-deployment-guide.md | Development, staging, and production deployment |
+---
+# Architecture Decision Records
+Major engineering decisions are documented inside:
+docs/adr/
+These records explain:
+- the decision - the reasoning - alternatives considered - consequences
+---
+# Engineering Philosophy
+BookHive follows modern software engineering principles.
+
+The project prioritises:
+1. Correctness 2. Security 3. Maintainability 4. Scalability 5. Performance 6. Developer Experience
+---
+# Coding Philosophy
+The codebase should always be:
+- Clean - Readable - Modular - Strongly Typed - Well Tested - Self-Documenting
+Tutorial-style code, shortcuts, and unnecessary complexity should be avoided.
+---
+# Documentation First
+BookHive follows a Documentation-First Development approach.
+No major feature should be implemented before its architecture, requirements, and behaviour are clearly documented.
+---
+# Versioning
+Documentation follows semantic versioning.
+Major architectural changes require:
+- documentation update - architecture review - ADR creation
+
+---
+# Getting Started
+Read the documentation in the following order:
+1. AGENTS.md 2. Project Constitution 3. Engineering Standards 4. Software Requirements Specification 5. Software Architecture 6. Project Structure 7. Remaining technical documents
+---
+# License
+Project documentation is maintained as part of the BookHive repository. # AGENTS.md
+# BookHive AI Engineering Guide
+Version: 1.0.0 Status: Active Project: BookHive Last Updated: TBD
+---
+# Purpose
+This document defines how AI coding assistants must contribute to BookHive.
+Every implementation must follow this document.
+If any instruction conflicts with another document, follow this order:
+1. Project Constitution 2. AGENTS.md 3. Engineering Standards 4. Software Architecture 5. Other Documentation
+
+---
+# Project Vision
+BookHive is an AI-powered social reading platform that helps users discover books, build reading habits, connect with like-minded readers, and participate in intelligent reading communities.
+BookHive is **not** simply a CRUD application.
+It is intended to be a production-quality SaaS application built using modern software engineering principles.
+---
+# Development Philosophy
+Every feature should be written as if it will serve millions of users.
+Avoid temporary solutions.
+Avoid shortcuts.
+Avoid tutorial-style implementations.
+Always favour long-term maintainability.
+---
+# Engineering Principles
+Always prioritise:
+1. Correctness 2. Security 3. Maintainability 4. Readability 5. Scalability 6. Performance 7. Developer Experience
+Never sacrifice correctness for convenience.
+
+---
+# Technology Stack
+## Frontend
+- React 19 - TypeScript - Vite - React Router v7 - Tailwind CSS - Zustand - TanStack Query - Framer Motion
+## Backend
+- Node.js - Express.js - TypeScript - Prisma ORM - MongoDB Atlas - JWT - Google OAuth - Socket.IO - Zod
+## Storage
+Cloudinary
+## AI
+Grok API
+Implement behind an AI Provider abstraction.
+Never tightly couple the application to a single AI provider.
+## Package Manager
+pnpm
+Never use npm.
+
+Never generate npm commands. --# Architecture Use Feature-Based Architecture. Do not organise code by controllers/models/routes only. Instead organise by business features. Example: src/ modules/ auth/ books/ users/ library/ recommendations/ reviews/ friends/ chat/ book-clubs/ video/ notifications/ search/ ai/
+
+shared/ config/ middleware/ utils/ --# TypeScript Rules Strict Mode required. Never disable strict mode. Never use: - any - @ts-ignore - non-null assertions unless absolutely necessary Prefer: - unknown - explicit interfaces - inferred types - utility types Everything must be type-safe. --# React Standards Use: Functional Components React Hooks Custom Hooks
+
+Composition Reusable Components Lazy Loading Memoization only when necessary. Avoid prop drilling. Prefer Context or Zustand. --# Express Standards Use: Controllers Services Repositories (where appropriate) Validation Middlewares Centralised Error Handling Never place business logic inside routes. --# API Design RESTful APIs. Consistent naming. Proper HTTP methods. Proper status codes.
+
+Consistent error responses. Version APIs if required. --# Validation Every request must be validated. Use Zod. Never trust client input. Validate: Body Params Query Headers where appropriate. --# Authentication JWT Authentication Google OAuth Role support should remain extensible even if Version 1 only includes standard users. Never expose sensitive information. --# Database MongoDB Atlas Prisma ORM
+
+Optimise indexes. Avoid duplicate data. Design collections for scalability. --# AI Development AI should power: Book recommendations Reader similarity Natural language search Reading suggestions Discussion prompts Future AI features should integrate through the AI Provider interface. --# Security Standards Always: Hash passwords. Validate input. Rate limit APIs. Sanitise data. Protect against XSS. Protect secrets. Never hardcode credentials.
+
+--# Performance Standards Always consider: Pagination Caching Lazy Loading Image Optimisation Bundle Size Database Query Optimisation Network Efficiency --# Accessibility Every page should: Support keyboard navigation. Use semantic HTML. Support screen readers. Meet WCAG recommendations where practical. --# Error Handling Never expose internal errors. Use consistent error responses. Log server errors.
+
+Provide meaningful client messages. --# Logging Use structured logging. Never log passwords. Never log secrets. Log important business events. --# Testing Philosophy Code should be testable. Write modular code. Avoid tightly coupled implementations. Consider edge cases before implementation. --# Documentation Every major module should include: Purpose Responsibilities Important notes Public interfaces Document architectural decisions. ---
+
+# Code Style Write self-documenting code. Avoid unnecessary comments. Use comments to explain "why", not "what". Prefer readability over cleverness. --# Naming Conventions Use meaningful names. Avoid abbreviations. Avoid single-letter variables except loop counters. Examples: getRecommendedBooks() calculateReadingProgress() findSimilarReaders() --# Folder Structure Keep files small. Keep modules cohesive. Avoid giant utility folders. Business logic belongs to the feature it supports. --# Dependencies
+
+Before adding a dependency: Determine if it is necessary. Prefer established libraries. Avoid abandoned packages. Minimise dependency bloat. --# AI Decision Making When multiple implementations are possible: Choose the simplest solution that remains scalable. Explain major architectural decisions. Avoid unnecessary complexity. --# UI Standards Match the approved BookHive design system. Dark-first interface. Premium feel. Consistent spacing. Smooth animations. Responsive. Accessible. Never invent a different design language. ---
+
+# Git Write meaningful commits. Keep commits focused. One concern per commit. --# Pull Requests Every PR should: Compile successfully. Pass linting. Pass tests. Be documented if necessary. --# Definition of Done A feature is complete only if: Code compiles. No TypeScript errors. Responsive. Accessible. Validated. Tested. Documented. Reviewed.
+
+Matches the design system. --# Forbidden Practices Do NOT: Use npm. Use JavaScript. Use `any`. Hardcode secrets. Duplicate logic. Ignore errors. Disable TypeScript. Write monolithic files. Generate code without considering architecture. Write code that contradicts the documentation. --# AI Behaviour If requirements are unclear: Do not guess. Explain assumptions. Request clarification when necessary. If a better architectural approach exists: Explain why.
+
+Recommend it.
+Only proceed after documenting the decision.
+---
+# Final Principle
+Every line of code should move BookHive closer to being a production-ready, maintainable, scalable application built to modern industry standards.
+Quality is never optional. # 01 - Project Constitution
+Version: 1.0.0 Status: Active Project: BookHive Document Owner: Engineering Team Last Updated: TBD
+---
+# 1. Purpose
+This constitution establishes the guiding principles, engineering standards, and product philosophy governing the development of BookHive.
+Every technical and product decision must align with this constitution.
+If a conflict arises between implementation and this document, the constitution takes precedence until officially amended.
+---
+# 2. Vision
+To build the world's most intelligent social reading platform that helps people discover meaningful books, develop lifelong reading habits, and connect with readers through AI-powered recommendations and communities.
+BookHive is more than a book recommendation platform.
+It is an ecosystem where reading becomes collaborative, intelligent, and engaging.
+
+--# 3. Mission Build a modern, scalable, AI-first reading platform that enables users to: · Discover books they'll genuinely enjoy. · Build sustainable reading habits. · Track reading progress. · Meet readers with similar interests. · Participate in book clubs. · Join live discussions. · Learn from an intelligent AI reading assistant. --# 4. Core Values BookHive is built on seven core values. ## 4.1 User First Every feature exists to improve the reader's experience. Technology serves users--not the other way around. --## 4.2 Simplicity Simple software is easier to use, maintain, and scale. Avoid unnecessary complexity. --## 4.3 Quality
+
+Every feature should feel polished. Every interaction should feel intentional. --## 4.4 Scalability Design today's code with tomorrow's growth in mind. Avoid decisions that create unnecessary technical debt. --## 4.5 Security Security is a requirement--not a feature. Every implementation should be secure by default. --## 4.6 Accessibility BookHive should be usable by as many people as possible. Accessibility should be considered throughout development. --## 4.7 Continuous Improvement The platform should evolve continuously through user feedback, analytics, and thoughtful iteration. --# 5. Product Principles BookHive must always remain: AI-first. Reader-focused.
+
+Community-driven. Data-informed. Performance-oriented. Privacy-conscious. Production-ready. --# 6. Engineering Principles All engineering decisions should prioritise: 1. Correctness 2. Security 3. Maintainability 4. Scalability 5. Readability 6. Performance 7. Developer Experience If trade-offs are required, they should be evaluated in this order. --# 7. Development Philosophy BookHive follows Documentation-First Development. Requirements are documented before implementation. Architecture is designed before coding. Major technical decisions are recorded using ADRs.
+
+Code exists to implement documented requirements--not define them.
+---
+# 8. Technology Principles
+The technology stack has been deliberately selected.
+Major changes require an Architecture Decision Record (ADR).
+Approved technologies include:
+Frontend
+· React · TypeScript · Vite · React Router · Tailwind CSS · Zustand · TanStack Query · Framer Motion
+Backend
+· Node.js · Express.js · Prisma ORM · MongoDB Atlas · Socket.IO · Zod
+Storage
+· Cloudinary
+AI
+· Grok API through an AI Provider abstraction layer.
+Package Manager
+· pnpm
+
+No unapproved framework or library should replace these technologies without approval. --# 9. User Experience Principles The user experience should feel: Elegant. Fast. Minimal. Modern. Accessible. Consistent. Professional. The approved BookHive design language is the single source of truth for visual design. --# 10. AI Philosophy Artificial Intelligence should assist--not replace--the reader. AI recommendations should be: Transparent. Helpful. Personalised. Privacy-conscious. Explainable where practical. The platform should never manipulate users through opaque recommendation practices.
+
+--# 11. Privacy Principles Users own their data. Collect only data necessary to provide features. Protect user information. Never expose personal data. Never sell user data. Respect user privacy preferences. --# 12. Performance Standards The application should strive for: Fast initial load times. Efficient database queries. Optimised bundle sizes. Responsive interfaces. Minimal unnecessary network requests. Smooth animations. Performance should be considered during implementation--not afterwards. --# 13. Security Principles Every feature should be secure by default. Passwords must be hashed.
+
+Input validated. Sensitive data protected. Authentication verified. Secrets never committed. Security reviews should accompany significant features. --# 14. Code Quality Standards Every contribution should be: Readable. Modular. Strongly typed. Well documented. Well tested. Maintainable. Reusable where appropriate. Tutorial-style code is not acceptable. --# 15. Documentation Principles Documentation is part of the product. Every significant architectural decision must be documented. Documentation should evolve alongside the codebase. Outdated documentation should be updated immediately.
+
+--# 16. Testing Philosophy Quality is verified--not assumed. Every feature should be testable. Testing should include: Unit tests. Integration tests. API tests. Real-time communication tests. Manual validation. --# 17. Definition of Success BookHive succeeds when it is: Reliable. Secure. Scalable. Maintainable. Enjoyable to use. Easy to contribute to. Built to modern industry standards. --# 18. Amendment Process
+
+Changes to this constitution require:
+Discussion.
+Approval.
+Documentation updates.
+An Architecture Decision Record where applicable.
+No implementation should violate this constitution without an approved amendment.
+---
+# Final Statement
+BookHive is intended to demonstrate excellence in software engineering, product design, and user experience.
+Every contributor--human or AI--shares responsibility for maintaining these standards.
+The quality of the platform reflects the discipline of the engineering process. # 02 - Engineering Standards
+Version: 1.0.0 Status: Active Project: BookHive Document Owner: Engineering Team Last Updated: TBD
+---
+# 1. Purpose
+This document defines the engineering standards for BookHive.
+Every engineer and AI coding assistant must follow these standards to ensure consistency, maintainability, scalability, and production-quality software.
+These standards apply to every line of code committed to the repository.
+---
+
+# 2. Engineering Philosophy
+BookHive follows modern software engineering principles.
+Every implementation should be:
+- Correct - Secure - Maintainable - Readable - Performant - Scalable - Testable
+Never optimise for speed of development at the expense of long-term maintainability.
+---
+# 3. Technology Standards
+## Frontend
+- React 19 - TypeScript - React Router v7 - Vite - Tailwind CSS - Zustand - TanStack Query - Framer Motion
+## Backend
+- Node.js - Express.js - TypeScript - Prisma ORM - MongoDB Atlas - JWT - Google OAuth - Socket.IO - Zod
+## Storage
+
+Cloudinary ## AI Grok API through an AI Provider abstraction. ## Package Manager pnpm only. Never use npm. --# 4. Project Structure BookHive follows Feature-Based Architecture. Example: frontend/ src/ modules/ auth/ books/ library/ recommendations/ reviews/ friends/ clubs/ chat/ video/
+
+profile/ search/ notifications/ shared/ components/ hooks/ services/ types/ utils/ backend/ src/ modules/ auth/ books/ users/ recommendations/ reviews/ library/ friends/ clubs/ chat/ video/
+
+notifications/ ai/ shared/ config/ middleware/ utils/ --# 5. File Naming Components PascalCase BookCard.tsx RecommendationCard.tsx Hooks camelCase useAuth.ts useRecommendations.ts Utilities camelCase formatDate.ts calculateProgress.ts Types PascalCase
+
+Book.ts User.ts Folders kebab-case book-details/ reading-history/ --# 6. TypeScript Standards Strict Mode is mandatory. Never use: - any - @ts-ignore - @ts-nocheck Prefer: unknown interfaces utility types generics discriminated unions Use readonly where appropriate. Prefer explicit return types on exported functions. --# 7. React Standards
+
+Only Functional Components. No class components. Keep components focused. Prefer composition over inheritance. Extract reusable logic into custom hooks. Avoid prop drilling. Prefer Zustand or Context where appropriate. Separate UI from business logic. --# 8. State Management Use local state first. Global state only when necessary. Server state belongs in TanStack Query. Client state belongs in Zustand. Do not duplicate server state. --# 9. Styling Standards Tailwind CSS only. Avoid inline styles. Prefer reusable UI components. Maintain consistent spacing. Follow the approved design system.
+
+Dark mode first. --# 10. API Standards RESTful design. Resource-based URLs. Examples: GET /books GET /books/:id POST /reviews PATCH /profile DELETE /bookmarks/:id Always use appropriate HTTP methods. Always return consistent response structures. --# 11. Validation All incoming data must be validated. Use Zod. Validate: - body - params - query - headers where appropriate Never trust client input.
+
+--# 12. Error Handling Centralised error handling only. Never expose internal errors. Return consistent error objects. Include: - error code - message - timestamp - request id (where available) --# 13. Logging Use structured logging. Log: Authentication events Server startup Critical errors AI requests Socket connections Never log: Passwords Tokens Secrets Sensitive personal information
+
+--# 14. Authentication JWT authentication. Google OAuth. Passwords hashed using bcrypt. Protected routes require authentication middleware. Authorisation checks must occur server-side. --# 15. Database Standards Use Prisma ORM. Use MongoDB Atlas. Avoid duplicate data. Use indexes where appropriate. Optimise queries. Avoid unnecessary nested writes. Document schema changes. --# 16. AI Standards Never call Grok directly from controllers. Use an AI Provider interface. Example: AIProvider
+
+ GrokProvider  RecommendationService  Controller This ensures future AI providers can be added without changing business logic. --# 17. Socket.IO Standards Socket handlers belong in feature modules. Validate socket payloads. Authenticate socket connections. Separate business logic from socket events. --# 18. Performance Standards Always consider: Pagination Caching Lazy loading Image optimisation Bundle splitting Database optimisation
+
+Memoisation when justified Avoid unnecessary re-renders. --# 19. Accessibility Standards Semantic HTML. Keyboard navigation. ARIA labels where appropriate. Colour contrast. Visible focus states. Accessible forms. WCAG-aware implementation. --# 20. Security Standards Validate all input. Sanitise output. Hash passwords. Rate limit APIs. Secure environment variables. Protect against XSS. Protect against CSRF where applicable. Never trust client-side validation. ---
+
+# 21. Dependency Management Before adding a dependency: - Evaluate necessity. - Prefer actively maintained libraries. - Avoid duplicate functionality. - Minimise dependency count. Every new dependency should have a clear justification. --# 22. Git Standards Branch naming: feature/ bugfix/ hotfix/ docs/ refactor/ Commit messages follow Conventional Commits. Examples: feat: fix: docs: refactor: test: chore:
+
+--# 23. Documentation Standards Every exported module should have clear documentation. Complex algorithms require implementation notes. Major architectural decisions require an ADR. --# 24. Testing Standards All features should be testable. Consider: Unit tests Integration tests API tests Socket tests Edge cases Failure scenarios --# 25. Code Review Checklist Before merging, verify:  Builds successfully  Passes linting  No TypeScript errors  Matches design system
+
+ Responsive  Accessible  Inputs validated  Error handling implemented  Security considered  No duplicated code  Documentation updated  Tests added where applicable --# 26. Definition of Engineering Excellence Engineering excellence means: Readable code. Predictable architecture. Thoughtful abstractions. Minimal technical debt. High cohesion. Low coupling. Production readiness. Every contribution should improve the codebase rather than merely increase its size. # 03 - Software Requirements Specification (SRS) Version: 1.0.0 Status: Active Project: BookHive Standard: IEEE 29148 (Adapted) Document Owner: Engineering Team
+
+Last Updated: TBD
+---
+# 1. Introduction
+## 1.1 Purpose
+This Software Requirements Specification (SRS) defines the functional and non-functional requirements for BookHive.
+It serves as the primary reference for developers, designers, testers, stakeholders, and AI coding assistants throughout the software development lifecycle.
+No implementation should introduce behaviour not documented in this specification without approval.
+---
+## 1.2 Scope
+BookHive is an AI-powered social reading platform that enables users to:
+- Discover books through AI recommendations. - Track reading progress. - Organise personal libraries. - Rate and review books. - Connect with readers who share similar interests. - Participate in book clubs. - Join live discussions. - Communicate through chat and video sessions. - Receive personalised reading insights.
+---
+## 1.3 Intended Audience
+This document is intended for:
+- Software Engineers - Frontend Developers - Backend Developers - UI/UX Designers - QA Engineers
+
+- AI Coding Assistants - Future Contributors
+---
+# 2. Product Overview
+BookHive combines:
+- AI recommendation engine - Personal reading tracker - Social networking - Book clubs - Real-time messaging - Video discussion rooms
+into a single modern platform.
+---
+# 3. User Roles
+## Guest
+Can:
+- View landing page - Browse public books - Search books - Register - Login
+Cannot:
+- Save books - Join communities - Chat - Review books
+---
+## Registered User
+Can:
+
+- Manage profile - Build library - Track reading - Bookmark books - Rate books - Write reviews - Receive recommendations - Follow readers - Join clubs - Chat - Join video discussions
+---
+# 4. Functional Requirements
+## Authentication
+The system shall:
+- Register users. - Authenticate users. - Support Google OAuth. - Reset passwords. - Maintain secure sessions.
+---
+## User Profile
+The system shall allow users to:
+- Edit profile - Upload profile picture - Select favourite genres - Select favourite authors - View reading statistics
+---
+## Book Catalogue
+The system shall:
+
+- Display books - Search books - Filter books - Categorise books - Display book details - Display similar books
+---
+## Reading Library
+Users shall be able to:
+- Add books to library - Remove books - Bookmark books - Track reading progress - Mark books as:
+- Want to Read - Currently Reading - Finished - Dropped
+---
+## Reviews
+Users shall:
+- Rate books - Review books - Edit reviews - Delete reviews - Like reviews
+---
+## AI Recommendation Engine
+The system shall:
+- Analyse reading history. - Analyse favourite genres.
+
+- Analyse favourite authors. - Analyse reviews. - Analyse ratings. - Recommend books. - Recommend readers. - Recommend clubs.
+---
+## Reader Network
+Users shall:
+- Follow users. - Unfollow users. - View profiles. - Discover similar readers. - Share reading activity.
+---
+## Book Clubs
+Users shall:
+- Create clubs. - Join clubs. - Leave clubs. - Invite members. - Schedule discussions.
+---
+## Chat
+Users shall:
+- Send messages. - Receive messages. - Create group chats. - Receive typing indicators. - Share links.
+---
+
+## Video Rooms
+Users shall:
+- Join rooms. - Leave rooms. - Enable camera. - Enable microphone. - Share screen. - Participate in discussions.
+---
+## Notifications
+Users shall receive notifications for:
+- Friend requests - Recommendations - Club invitations - Messages - Reviews - Reading milestones
+---
+# 5. Non-Functional Requirements
+## Performance
+- Fast initial load. - Responsive UI. - Efficient database queries. - Pagination. - Optimised assets.
+---
+## Reliability
+The application should recover gracefully from failures.
+---
+
+## Scalability
+Architecture should support future growth without major redesign.
+---
+## Security
+- JWT authentication - Password hashing - Input validation - Rate limiting - Secure secrets - HTTPS in production
+---
+## Accessibility
+The application should follow WCAG recommendations where practical.
+---
+## Maintainability
+Code should:
+- Be modular. - Be documented. - Be testable. - Be strongly typed.
+---
+# 6. Business Rules
+- A user may only review a book once. - Users may edit their own reviews. - Users cannot edit another user's content. - Private clubs require invitations. - Public clubs are discoverable. - AI recommendations are personalised. - Reading progress cannot exceed 100%.
+
+---
+# 7. Constraints
+- React frontend - Express backend - MongoDB - Prisma ORM - Grok AI - Cloudinary - pnpm package manager
+---
+# 8. Assumptions
+- Users have internet access. - AI provider is available. - Cloudinary is operational. - MongoDB Atlas is accessible.
+---
+# 9. Future Enhancements (Out of Scope for V1)
+- Mobile applications - Offline reading mode - E-book reader - Audiobook support - Author verification - Publisher dashboard - Marketplace - Premium subscriptions - AI reading coach - Reading challenges - Achievement system - Multi-language interface
+---
+# 10. Acceptance Criteria
+BookHive Version 1 is considered complete when:
+
+- All functional requirements are implemented. - Non-functional requirements are met. - Documentation is complete. - Testing passes. - Security review is complete. - UI matches the approved design system. ## Architecture Guardrails The AI assistant must not make architectural changes without explicit approval. Examples include: - Replacing Prisma with another ORM. - Replacing React Router. - Changing the folder structure. - Introducing Redux. - Switching package managers. - Replacing Tailwind CSS. - Changing authentication strategy. - Introducing GraphQL. - Migrating to Next.js. - Removing TypeScript strict mode. - Replacing Express.js with another framework. If such a change appears beneficial, document the rationale and request approval before implementing it. ### Feature: Reading Library #### User Story As a reader, I want to organise books into different reading states, So that I can easily track my reading journey. --Acceptance Criteria
+ Add a book to "Want to Read"  Move to "Currently Reading"  Update progress  Mark as Finished  Progress persists after refresh  Reading history updates automatically# 04 - Software Architecture Document (SAD)
+Version: 1.0.0 Status: Active Standard: IEEE 42010 (Adapted) Project: BookHive
+
+--# 1. Purpose This document describes the high-level architecture of BookHive. It defines the system structure, architectural decisions, module boundaries, communication patterns, and technology choices that guide implementation. All development must align with this architecture unless an approved Architecture Decision Record (ADR) supersedes it. --# 2. Architectural Goals BookHive must be: - Scalable - Maintainable - Secure - Testable - Modular - Extensible - Performance-oriented --# 3. Architectural Style BookHive follows: - Feature-Based Modular Architecture - Layered Architecture - RESTful API Design - Component-Based Frontend - Event-Driven Real-Time Communication ---
+04 ­ Software Architecture Document (SAD)
+This is where we define how BookHive is built.
+If the SRS answers "What should the system do?", the Software Architecture Document answers "How will the system achieve it?"
+I want this document to be one of the strongest parts of the project because architecture is what separates a portfolio project from a production-grade application.
+# 04 - Software Architecture Document (SAD)
+Version: 1.0.0
+
+Status: Active Standard: IEEE 42010 (Adapted) Project: BookHive
+---
+# 1. Purpose
+This document describes the high-level architecture of BookHive.
+It defines the system structure, architectural decisions, module boundaries, communication patterns, and technology choices that guide implementation.
+All development must align with this architecture unless an approved Architecture Decision Record (ADR) supersedes it.
+---
+# 2. Architectural Goals
+BookHive must be:
+- Scalable - Maintainable - Secure - Testable - Modular - Extensible - Performance-oriented
+---
+# 3. Architectural Style
+BookHive follows:
+- Feature-Based Modular Architecture - Layered Architecture - RESTful API Design - Component-Based Frontend - Event-Driven Real-Time Communication
+---
+
+# 4. High-Level Architecture
+
+React Frontend
+
+
+
+React Router + Zustand
+
+
+
+TanStack Query
+
+
+
+REST API
+
+
+
+Express Backend
+
+
+
+
+
+
+
+
+
+
+
+
+
+Auth Books Recommendation Chat
+
+Module Module
+
+Module Module
+
+
+
+
+
+
+
+
+
+
+
+
+
+Prisma ORM
+
+
+
+MongoDB Atlas
+
+
+
+
+
+
+
+Cloudinary
+
+Grok Provider
+
+
+
+
+
+
+
+
+
+AI Provider
+
+5. Frontend Architecture
+
+The frontend follows a feature-based modular structure.
+
+Each feature owns its:
+
+Pages Components Hooks Services Types Validation Styles
+
+Tests Example: src/ modules/ auth/ books/ library/ reviews/ recommendations/ clubs/ chat/ video/ notifications/ profile/ search/ shared/ No feature should directly depend on another feature's internal implementation. Shared functionality belongs in the shared module. 6. Backend Architecture The backend is organised by business capabilities rather than technical layers. Each module contains: books/
+
+book.controller.ts book.service.ts book.repository.ts book.routes.ts book.schema.ts book.types.ts book.socket.ts (if applicable) book.test.ts This keeps related code together and improves maintainability. 7. Layered Architecture Every backend module follows the same responsibility flow: Request  Route  Controller  Service  Repository  Prisma ORM
+
+
+MongoDB
+Responsibilities:
+Routes: Define endpoints and middleware. Controllers: Handle HTTP requests and responses. Services: Contain business logic. Repositories: Encapsulate database access. Prisma: Database abstraction. MongoDB: Persistent storage. 8. Authentication Architecture
+Authentication supports:
+Email & Password Google OAuth
+JWTs are issued after successful authentication.
+Protected routes use authentication middleware.
+Passwords are hashed before storage.
+Authorisation checks occur server-side.
+9. AI Architecture
+AI features are isolated behind an abstraction layer.
+Recommendation Service
+
+AI Provider Interface
+
+Grok Provider
+Benefits:
+Loose coupling
+
+Easier testing Future provider replacement (Gemini, OpenAI, Claude, etc.) Consistent API surface 10. Real-Time Communication
+BookHive uses:
+Socket.IO for messaging and presence WebRTC for voice/video communication
+Socket.IO responsibilities:
+Presence Typing indicators Chat Notifications
+WebRTC responsibilities:
+Audio Video Screen sharing 11. File Storage
+Cloudinary stores:
+User avatars Book cover uploads (where applicable) Club images Shared media
+The backend never stores binary files directly.
+Only secure URLs and metadata are persisted.
+12. Data Access
+Prisma is the only component allowed to communicate with MongoDB.
+Controllers and services must never execute raw database queries directly.
+This ensures consistency, testability, and maintainability.
+13. Error Handling
+
+All errors pass through centralised middleware.
+Clients receive a consistent error format.
+Sensitive implementation details are never exposed.
+14. Logging
+Structured logging records:
+Authentication events AI requests Socket connections Server errors Important business events
+Sensitive data is never logged.
+15. Security Architecture
+Security measures include:
+JWT Authentication Password hashing Zod validation Rate limiting Secure headers Environment variable management Input sanitisation 16. Performance Strategy
+Performance considerations include:
+Pagination Lazy loading Image optimisation Query optimisation Code splitting Client-side caching CDN-backed image delivery via Cloudinary 17. Scalability Strategy
+BookHive should scale horizontally by:
+
+Stateless backend services Externalised storage Modular feature architecture AI provider abstraction Independent real-time services 18. Architectural Constraints
+The following technologies are fixed unless superseded by an ADR:
+React TypeScript Vite React Router Express.js Prisma ORM MongoDB Atlas Socket.IO WebRTC Cloudinary pnpm 19. Architecture Principles High cohesion Low coupling Separation of concerns Dependency inversion Single responsibility DRY (Don't Repeat Yourself) KISS (Keep It Simple) YAGNI (You Aren't Gonna Need It) 20. Future Evolution
+The architecture should support future additions such as:
+Mobile applications AI Reading Coach Recommendation improvements Offline support Microservices (only if justified) Multi-language support
+Without requiring a complete redesign.
+
+---
+ ## I have one major recommendation
+I don't want our architecture document to rely only on text.
+I think we should include a **`docs/diagrams/`** folder containing professional diagrams, such as:
+- **System Architecture Diagram** - **Frontend Component Diagram** - **Backend Module Diagram** - **Database ER Diagram** - **Authentication Flow** - **AI Recommendation Flow** - **Chat Sequence Diagram** - **Video Call Sequence Diagram** - **Reading Recommendation Workflow** - **User Journey Diagrams**
+These diagrams will make the documentation much easier to understand and will also be excellent artefacts to sh # 05 - Project Structure
+Version: 1.0.0 Status: Active Project: BookHive
+---
+# 1. Purpose
+This document defines the official folder structure for BookHive.
+Every file in the project must have a clear, predictable location.
+The goal is to improve:
+- Discoverability - Maintainability - Scalability - Team collaboration - AI-assisted development
+
+No file should exist without a clear architectural reason.
+---
+# 2. Repository Structure
+BookHive/
+ frontend/  backend/  docs/  .github/  AGENTS.md  README.md  pnpm-workspace.yaml  package.json  pnpm-lock.yaml  .editorconfig  .gitignore  .env.example  LICENSE
+---
+# 3. Monorepo
+BookHive uses a pnpm Workspace.
+Reason:
+- Shared tooling - Shared TypeScript configuration - Shared linting - Shared utilities - Easier dependency management - Faster installations
+---
+# 4. Frontend Structure
+frontend/
+src/
+
+assets/ modules/ shared/ routes/ hooks/ contexts/ providers/ services/ lib/ types/ styles/ constants/ config/ utils/ App.tsx main.tsx --# 5. Modules Every feature owns its own files. Example: modules/ auth/
+
+books/ library/ recommendations/ reviews/ profile/ friends/ clubs/ chat/ video/ notifications/ search/ home/ settings/ Each module should remain independent. --# 6. Example Feature books/ components/ pages/ hooks/ services/ api/
+
+types/ schemas/ constants/ utils/ index.ts --# 7. Shared Folder Shared contains reusable code. shared/ components/ layouts/ icons/ modals/ ui/ hooks/ utils/ constants/ types/ No business logic belongs here. --# 8. Backend Structure backend/
+
+src/ modules/ shared/ config/ middleware/ lib/ providers/ utils/ server.ts app.ts --# 9. Backend Module books/ book.controller.ts book.service.ts book.repository.ts book.routes.ts book.schema.ts book.types.ts book.validators.ts book.socket.ts book.constants.ts
+
+index.ts --# 10. Config Folder config/ database.ts cloudinary.ts jwt.ts socket.ts env.ts cors.ts logger.ts --# 11. Providers providers/ ai/ storage/ oauth/ email/ Providers wrap external services. Example: AIProvider StorageProvider
+
+EmailProvider GoogleProvider Never call third-party SDKs directly from business logic. --# 12. Shared Backend shared/ errors/ responses/ middleware/ constants/ types/ validators/ helpers/ logger/ --# 13. Database backend/ prisma/ schema.prisma seed.ts Prisma is the single source of truth for data models. ---
+
+# 14. Tests Every module owns its tests. books/ tests/ book.service.test.ts book.controller.test.ts book.routes.test.ts Avoid placing all tests in one global folder. --# 15. Documentation docs/ README.md ADR/ Architecture/ API/ Database/ UI/ Diagrams/ Requirements/ Engineering/ Testing/ Roadmap/
+
+--# 16. Assets Frontend assets should contain only static resources. assets/ images/ icons/ fonts/ logos/ illustrations/ animations/ Do not store user-uploaded content here. --# 17. Constants constants/ routes.ts roles.ts permissions.ts queryKeys.ts app.ts Avoid magic strings throughout the application. --# 18. Types
+
+Global reusable types belong in: types/ Feature-specific types belong inside their feature module. --# 19. Utilities Utilities should be: Pure Reusable Independent No business logic. --# 20. Naming Rules Folders: kebab-case Files: camelCase for utilities PascalCase for React components Hooks: useFeatureName.ts Types: PascalCase Constants:
+
+UPPER_SNAKE_CASE --# 21. Barrel Files Every feature exports a public API. Example: index.ts Only expose what other modules need. Never import deeply into another feature. --# 22. Module Boundaries Features should communicate through: Services Hooks Public exports Never access another feature's internal implementation directly. --# 23. Dependency Direction Allowed: UI  Hooks 
+
+Services  API  Backend Not Allowed: Component  Direct database access --# 24. Maximum File Size Recommended: Components: < 250 lines Services: < 300 lines Hooks: < 200 lines Large files should be refactored. --# 25. Folder Ownership Each feature owns:
+
+Components Hooks API Types Validation Tests Constants Utilities This keeps modules self-contained. --# 26. Future Expansion The structure should accommodate: Mobile app Admin portal (if introduced) Recommendation engine improvements AI providers Analytics Premium features Without major restructuring. --# Final Principle If a new file does not have an obvious home, reconsider the architecture before creating it.
+
+# 06 - Database Design Document (DDD)
+Version: 1.0.0 Status: Active Project: BookHive Database: MongoDB Atlas ORM: Prisma ORM
+---
+# 1. Purpose
+This document defines the complete database architecture for BookHive.
+It specifies:
+- Data models - Relationships - Constraints - Indexing - Validation - Query optimisation - Scalability considerations
+This document is the single source of truth for the database design.
+---
+# 2. Database Principles
+The database must be:
+- Normalised where practical - Optimised for reads - Scalable - Secure - Maintainable - Extensible
+Avoid unnecessary data duplication.
+Design with future growth in mind.
+---
+
+# 3. Database Technology Database MongoDB Atlas ORM Prisma ORM Package Manager pnpm --# 4. Collections BookHive Version 1 contains the following collections. Core Collections · User · Book · Author · Genre · Review · Rating · ReadingList · ReadingProgress · Bookmark · Recommendation · Notification
+
+Social Collections · Follow · Conversation · Message · BookClub · ClubMember · ClubEvent Real-Time Collections · VideoRoom · VideoParticipant System Collections · RefreshToken · AuditLog --# 5. User Collection Purpose Stores user accounts. Fields id email passwordHash googleId
+
+username displayName bio avatar location website favouriteGenres favouriteAuthors createdAt updatedAt Indexes email username googleId Relationships One User  Many Reviews  Many Reading Lists  Many Messages
+
+ Many Clubs  Many Recommendations --# 6. Book Collection Stores all books. Fields id title subtitle description isbn10 isbn13 publishedDate pageCount language coverImage publisher averageRating ratingCount createdAt
+
+updatedAt Relationships Book  Author  Genres  Reviews  Bookmarks  Reading Progress Indexes title isbn13 publisher averageRating --# 7. Author Collection Fields id
+
+name bio photo birthDate deathDate nationality website Relationships Author  Many Books --# 8. Genre Collection Fields id name description icon Relationships Genre  Many Books
+
+--# 9. Review Collection Fields id userId bookId rating title content likes createdAt updatedAt Constraints One review per user per book. --# 10. Reading List Fields id userId bookId status progress
+
+startedAt finishedAt notes Statuses Want To Read Currently Reading Completed Dropped Paused --# 11. Bookmark Fields id userId bookId page note createdAt --# 12. Recommendation Stores AI-generated recommendations. Fields
+
+id userId bookId reason confidenceScore generatedBy createdAt Benefits - Faster loading - Cached AI responses - Analytics - Recommendation history --# 13. Follow Represents social relationships. Fields followerId followingId createdAt Unique Constraint followerId + followingId --# 14. Conversation
+
+Fields id type name createdBy lastMessage updatedAt Types Private Group Book Club --# 15. Message Fields id conversationId senderId content attachments edited deleted createdAt
+
+Indexes conversationId senderId createdAt --# 16. Book Club Fields id name description coverImage visibility ownerId memberCount createdAt Visibility Public Private Invite Only --# 17. Club Member Fields
+
+clubId userId role joinedAt Roles Owner Moderator Member --# 18. Club Event Fields clubId title description startTime endTime videoRoomId --# 19. Video Room Fields id clubId
+
+hostId status startedAt endedAt Statuses Scheduled Live Ended --# 20. Notification Fields id userId type title body read createdAt --# 21. Refresh Token Fields id
+
+userId tokenHash expiresAt revokedAt --# 22. Audit Log Fields id userId action entity entityId metadata createdAt Purpose Security Compliance Debugging --# 23. Relationships User 
+
+Reading List  Book  Review  Recommendation  Book Club  Conversation  Message --# 24. Indexing Strategy Create indexes on: Email Username Book Title ISBN Author Genre
+
+Recommendation User Conversation Message Timestamp Notification User --# 25. Data Validation All writes must be validated using: Zod Prisma Business Rules Client validation alone is insufficient. --# 26. Soft Deletes Prefer soft deletion where data recovery is valuable. Applicable to: Users Books Reviews Messages Clubs --# 27. Audit Strategy
+
+Critical actions should be logged. Examples Login Password Change OAuth Login Club Creation Review Deletion Profile Updates --# 28. Scalability Design should support: Millions of users Millions of books Large chat histories Large recommendation datasets High concurrent activity --# 29. Future Collections Reserved for future releases. Reading Challenges Achievements Premium Subscription
+
+AI Reading Coach
+Reading Goals
+Book Marketplace
+Audiobooks
+Offline Sync
+---
+# Final Principle
+The database should be designed for long-term maintainability, efficient querying, and future expansion without major schema redesign. # 07 - API Specification
+Version: 1.0.0 Status: Active Project: BookHive API Style: REST Specification: OpenAPI 3.1 (Reference)
+---
+# 1. Overview
+The BookHive API provides secure RESTful endpoints for all client applications.
+The API is designed to be:
+- Predictable - Versionable - Consistent - Secure - Scalable
+All responses use JSON.
+---
+# 2. Base URL
+
+Development
+/api/v1
+Production
+https://api.bookhive.com/api/v1
+---
+# 3. Authentication
+Authentication methods
+· JWT Access Token
+· Google OAuth
+Authenticated requests require
+Authorization
+Bearer <token>
+---
+# 4. Standard Success Response
+{ "success": true, "message": "Operation completed successfully.", "data": {}
+}
+---
+# 5. Standard Error Response
+{ "success": false, "message": "Validation failed.", "errors": [], "timestamp": "", "requestId": ""
+
+} --# 6. Status Codes 200 OK 201 Created 204 No Content 400 Bad Request 401 Unauthorized 403 Forbidden 404 Not Found 409 Conflict 422 Unprocessable Entity 429 Too Many Requests 500 Internal Server Error --# 7. Authentication Endpoints POST /auth/register POST /auth/login POST /auth/google POST /auth/logout POST /auth/refresh GET /auth/me
+
+PATCH /auth/profile DELETE /auth/account --# 8. User Endpoints GET /users/:id GET /users/:username PATCH /users/profile PATCH /users/preferences GET /users/statistics GET /users/library --# 9. Book Endpoints GET /books GET /books/:id GET /books/search GET /books/trending GET /books/recommended GET /books/new-releases GET /books/similar/:bookId --# 10. Library Endpoints GET /library
+
+POST /library PATCH /library/:bookId DELETE /library/:bookId --# 11. Reading Progress GET /reading-progress/:bookId PATCH /reading-progress/:bookId GET /reading-history --# 12. Bookshelf Endpoints GET /bookshelves POST /bookshelves PATCH /bookshelves/:id DELETE /bookshelves/:id POST /bookshelves/:id/books DELETE /bookshelves/:id/books/:bookId --# 13. Review Endpoints POST /reviews PATCH /reviews/:id DELETE /reviews/:id GET /reviews/book/:bookId
+
+GET /reviews/user/:userId POST /reviews/:id/like --# 14. Recommendation Endpoints GET /recommendations POST /recommendations/refresh GET /recommendations/books GET /recommendations/readers GET /recommendations/clubs --# 15. Search Endpoints GET /search GET /search/books GET /search/authors GET /search/readers GET /search/clubs --# 16. Reader Network POST /follow/:userId DELETE /follow/:userId GET /followers GET /following
+
+GET /discover/readers --# 17. Book Club Endpoints GET /clubs POST /clubs PATCH /clubs/:id DELETE /clubs/:id POST /clubs/:id/join POST /clubs/:id/leave GET /clubs/:id/members GET /clubs/:id/events --# 18. Club Events POST /events PATCH /events/:id DELETE /events/:id GET /events/upcoming --# 19. Chat GET /conversations POST /conversations GET /messages/:conversationId
+
+POST /messages PATCH /messages/:id DELETE /messages/:id --# 20. Video Rooms POST /video-rooms GET /video-rooms/:id POST /video-rooms/:id/join POST /video-rooms/:id/leave PATCH /video-rooms/:id DELETE /video-rooms/:id --# 21. Notifications GET /notifications PATCH /notifications/:id/read PATCH /notifications/read-all DELETE /notifications/:id --# 22. File Uploads POST /uploads/avatar POST /uploads/book-cover POST /uploads/club-cover
+
+--# 23. AI Endpoints POST /ai/recommend POST /ai/explain POST /ai/search POST /ai/discussion-prompts --# 24. Health GET /health GET /health/database GET /health/ai GET /health/storage --# 25. API Standards Every endpoint must: - Validate input using Zod. - Return consistent responses. - Use correct HTTP status codes. - Include authentication where required. - Handle errors gracefully. - Be documented before implementation. --# 26. Rate Limiting Authentication endpoints 10 requests/minute
+
+AI endpoints 20 requests/minute Search 100 requests/minute General API 200 requests/minute --# 27. API Versioning Current version v1 Future breaking changes require /api/v2 Older versions remain supported during migration periods. --# Final Principle The API should remain intuitive, predictable, secure, and backwards-compatible wherever practical. # 08 - User Flow Version: 1.0.0 Status: Active Project: BookHive --# 1. Purpose This document defines every major user journey within BookHive.
+
+The objective is to ensure:
+- Consistent user experience - Predictable navigation - Minimal user friction - Clear interaction patterns - Easy onboarding
+Every screen in BookHive should belong to at least one documented user flow.
+---
+# 2. User Journey Overview
+Guest User 
+Landing Page 
+Authentication 
+Onboarding 
+Home Feed 
+Discover Books 
+Read & Track 
+Connect With Readers 
+Join Communities 
+Live Discussions 
+
+Return Daily --# 3. Landing Page Flow User visits BookHive  Hero Section  Features  AI Recommendation Preview  Reader Communities  Testimonials  Call to Action  Sign In / Continue with Google Goal Convince visitors to create an account. --# 4. Authentication Flow
+
+Landing Page  Continue with Google  Google OAuth  Account Created  Complete Profile  Onboarding  Dashboard Alternative Existing User  Login  Dashboard Edge Cases - Invalid session - Cancelled OAuth - Existing account
+
+- Network failure --# 5. First-Time Onboarding After authentication, new users complete onboarding. Step 1 Choose favourite genres.  Step 2 Choose favourite authors.  Step 3 Choose favourite books.  Step 4 Reading goal  Step 5 Preferred book length  Step 6 Recommendation preferences 
+
+AI creates recommendation profile.  Dashboard Purpose Reduce the cold-start problem for recommendations. --# 6. Home Feed Dashboard  Today's Recommendations  Continue Reading  Trending Books  Friends Activity  Book Clubs  Reading Insights  Notifications
+
+ AI Suggestions Users can immediately continue reading or discover new content. --# 7. Discover Books Search  Filters  Genres  Authors  Trending  Recommendations  Book Details  Save to Library  Start Reading
+
+Filters include - Genre - Author - Rating - Language - Publication Year --# 8. Book Details Book Cover  Summary  Author Information  Ratings  Reviews  Similar Books  AI Recommendation Reason  Add to Library 
+
+Bookmark  Write Review --# 9. Personal Library Dashboard  My Library  Bookshelves  Reading Progress  Bookmarks  Completed Books  Reading Statistics Users can: - Move books - Create bookshelves - Track progress - Add notes ---
+
+# 10. Reading Progress Open Book  Start Reading  Update Progress  AI learns behaviour  Recommendations improve  Reading Statistics update Progress States - Want to Read - Currently Reading - Paused - Completed - Dropped --# 11. AI Recommendation Flow User Behaviour  Genres 
+
+Authors  Reviews  Ratings  Reading History  AI Analysis  Personalised Recommendations  User Feedback  AI Learns  Recommendation Quality Improves --# 12. Reader Discovery Dashboard  Discover Readers
+
+ Similarity Score  Shared Genres  Shared Authors  Shared Books  Follow Reader  View Profile  Start Conversation --# 13. Reader Profile Avatar  Reading Statistics  Favourite Genres 
+
+Favourite Books  Reviews  Bookshelves (if public)  Reading Activity  Follow  Message --# 14. Book Clubs Explore Clubs  View Club  Join Club  Discussions  Scheduled Events
+
+ Live Reading Session  Video Discussion  Community Growth Private clubs require invitations. --# 15. Chat Flow Open Conversation  Send Message  Typing Indicator  Delivered  Read  Reply  Share Book
+
+ Continue Discussion Supports Private Group Book Club chats --# 16. Video Discussion Flow Join Club Event  Join Video Room  Camera  Microphone  Screen Share (Future)  Book Discussion  Leave Room 
+
+Session Ends --# 17. Notification Flow Receive Notification  Open Notification  Navigate to Related Content  Mark as Read Examples - Friend followed you - Recommendation ready - Club invitation - Live discussion starting - Review received likes --# 18. Search Flow Search  Books  Authors 
+
+Readers  Clubs  Select Result  Navigate Recent searches are stored locally. --# 19. Settings Flow Profile  Preferences  Privacy  Notifications  Connected Account  Delete Account 
+
+Logout --# 20. Error States Every flow should gracefully handle: - Network failure - Authentication failure - Empty results - AI unavailable - Database timeout - Upload failure - Permission denied Users should always receive clear recovery options. --# 21. Empty States Examples Library Empty  Recommend first book No Clubs  Discover communities No Recommendations  Complete onboarding No Notifications
+
+ You're all caught up --# 22. Success States Examples Book added Review posted Progress updated Profile saved Club joined Friend followed Recommendation refreshed Success messages should be informative but unobtrusive. --# 23. UX Principles Every flow should minimise: - Clicks - Confusion - Waiting - Cognitive load The next action should always be obvious. --# Final Principle
+
+Every interaction in BookHive should feel intelligent, smooth, and rewarding, encouraging users to return regularly and build lasting reading habits. # 09 - UI Design System
+Version: 1.0.0 Status: Active Project: BookHive Design Philosophy: Premium · Modern · Intelligent · Accessible
+---
+# 1. Purpose
+The BookHive Design System defines the visual language, interaction patterns, reusable components, accessibility standards, and user experience principles used throughout the application.
+Its objectives are:
+- Consistency - Accessibility - Scalability - Reusability - Developer efficiency - Premium user experience
+Every interface must conform to this document.
+---
+# 2. Design Philosophy
+BookHive should feel:
+· Elegant
+· Premium
+· Calm
+· Intelligent
+· Minimal
+
+· Friendly
+· Fast
+The interface should never feel cluttered.
+Whitespace is part of the design.
+---
+# 3. Design Principles
+The interface should prioritise:
+1. Clarity 2. Simplicity 3. Readability 4. Consistency 5. Accessibility 6. Responsiveness 7. Delight
+---
+# 4. Theme
+Dark Theme First
+Light Theme Supported
+The application should automatically follow the user's system preference while allowing manual switching.
+---
+# 5. Colour Palette
+## Primary
+Deep Indigo
+Used for:
+Primary actions
+
+Highlights Links AI elements --## Secondary Royal Purple Used for: Recommendation cards AI insights Gradients --## Accent Amber Used sparingly for: Achievements Notifications Premium highlights Important badges --## Success Emerald ---
+
+## Warning Orange --## Error Crimson --## Background Dark Charcoal Primary surface --## Surface Elevated cards Dialogs Navigation --## Border Subtle grey with low opacity. --# 6. Typography Primary Font Inter Fallback
+
+System UI Hierarchy Display Heading 1 Heading 2 Heading 3 Body Large Body Caption Label Line heights should maximise readability. --# 7. Spacing System Use an 8-point grid. Examples 4px 8px 16px 24px 32px 40px 48px
+
+64px Never use arbitrary spacing values. --# 8. Border Radius Small Medium Large Extra Large Cards should have soft corners. Avoid sharp edges. --# 9. Shadows Three elevation levels. Subtle Medium High Avoid heavy shadows. Use elevation to indicate hierarchy. --# 10. Layout Maximum content width 1280px
+
+Content centred. Consistent gutters. Responsive breakpoints Mobile Tablet Desktop Large Desktop --# 11. Navigation Desktop Sidebar + Top Navigation Mobile Bottom Navigation + Drawer Navigation should remain predictable across all screens. --# 12. Buttons Variants Primary Secondary Outline Ghost Danger
+
+Loading Disabled Every button should have: Hover Focus Pressed Disabled Loading states. --# 13. Forms All forms must include: Labels Helper text Validation Error messages Success states Keyboard support Autocomplete where appropriate. --# 14. Inputs Variants
+
+Text Search Password Email Textarea Select Multi-select Checkbox Radio Toggle Date Picker Every input should have: Hover Focus Error Disabled Success states. --# 15. Cards Cards are the primary information container. Examples
+
+Book Card Reader Card Club Card Recommendation Card Statistic Card Cards should support: Hover animations Loading skeletons Empty states --# 16. Modals Used sparingly. Should include: Title Description Primary Action Secondary Action Close Button Escape support Focus trapping --# 17. Tables
+
+Responsive. Sortable. Searchable. Pagination supported. Used only where appropriate. --# 18. Icons Use Lucide React. Icons should always support: Accessible labels Consistent sizing Visual balance --# 19. Images Cloudinary optimised. Lazy loaded. Responsive. Fallback placeholders required. --# 20. Motion Use Framer Motion. Animations should communicate:
+
+State Feedback Hierarchy Navigation Avoid unnecessary animation. --# 21. Loading States Every asynchronous operation requires: Skeleton screens Loading indicators Progress indicators where appropriate Never leave users wondering if the application is frozen. --# 22. Empty States Every feature requires meaningful empty states. Examples No books No recommendations No messages No clubs Each empty state should guide users toward the next action. ---
+
+# 23. Error States Friendly. Actionable. Never expose technical details. Offer recovery actions where possible. --# 24. Notifications Support Toast notifications In-app notifications Badges Priority levels Notifications should never interrupt primary tasks unnecessarily. --# 25. Accessibility Keyboard navigation Screen reader support ARIA labels Visible focus indicators Colour contrast Reduced motion support Semantic HTML
+
+WCAG 2.2 AA compliance target. --# 26. Responsive Design Mobile First. Every page should function on: 320px 768px 1024px 1280px 1440px 1920px No horizontal scrolling. --# 27. Component Library Core reusable components include: Button Input Textarea Select Checkbox Avatar Badge
+
+Card Modal Tooltip Tabs Accordion Dropdown Pagination Search Bar Book Card Recommendation Card Reader Card Club Card Video Card Skeleton Loader Toast Navbar Sidebar Footer Breadcrumb Empty State Error State Loading Spinner
+
+--# 28. BookHive-Specific Components AI Recommendation Card Reading Progress Card Reading Goal Widget Reading Streak Widget Bookshelf Card Book Timeline Reader Match Card Book Club Card Discussion Card Live Session Card AI Insight Banner Book Quote Highlight Reading Statistics Widget These components are unique to the BookHive experience. --# 29. Micro-Interactions The interface should provide subtle feedback for: Hovering Liking Following
+
+Saving Rating Adding books Joining clubs Completing reading goals Micro-interactions should enhance--not distract from--the experience. --# 30. Design Tokens All colours, spacing, typography, radii, shadows, transitions, and z-index values should be defined as reusable design tokens. Hard-coded visual values are not permitted in application code. --# 31. Visual Consistency Every screen should appear to belong to the same product. New features must reuse existing patterns before introducing new ones. --# 32. Future Expansion The design system should support: Premium subscriptions Achievements Reading challenges Marketplace
+
+Mobile applications
+Tablet layouts
+Without requiring a redesign.
+---
+# Final Principle
+BookHive should feel like a thoughtfully crafted product rather than a collection of pages.
+Every interaction should reinforce trust, simplicity, and enjoyment while making reading feel more social and engaging. # 10 - AI Engine Design
+Version: 1.0.0 Status: Active Project: BookHive
+---
+# 1. Purpose
+This document defines the architecture of the BookHive AI Recommendation Engine.
+The AI system is responsible for helping users discover books, connect with similar readers, and engage with reading communities through intelligent recommendations.
+The AI should enhance--not replace--the user's decision making.
+---
+# 2. Design Principles
+The AI engine should be:
+- Helpful - Personalised - Explainable - Privacy-conscious - Extensible - Fast - Cost-efficient
+
+- Provider-independent
+
+---
+
+# 3. AI Responsibilities
+
+The AI engine powers:
+
+· Book Recommendations
+
+· Reader Recommendations
+
+· Book Club Recommendations
+
+· Natural Language Search
+
+· Reading Insights
+
+· Reading Habit Analysis
+
+· Discussion Prompts
+
+· Recommendation Explanations
+
+---
+
+# 4. AI Architecture
+
+User Behaviour
+
+
+
+
+
+
+
+
+
+
+
+Reading Data Social Data Preferences
+
+
+
+
+
+
+
+
+
+
+
+Recommendation Engine
+
+
+
+
+
+
+
+
+
+
+
+Collaborative Content-Based AI Reasoning
+
+Filtering Filtering Layer
+
+
+
+
+
+
+
+
+
+ Recommendation Ranking
+ Final Results
+---
+# 5. AI Data Sources
+The recommendation engine analyses:
+- Favourite genres - Favourite authors - Reading history - Reading progress - Bookshelves - Ratings - Reviews - Reading frequency - Session duration - Completed books - Abandoned books - Saved books - Followed readers - Joined clubs - Search history - Recommendation feedback
+---
+# 6. User Preference Profile
+Every user has an AI profile.
+Example attributes:
+Genres
+Authors
+Topics
+Book length
+
+Reading speed Preferred publication years Preferred languages Favourite publishers Preferred difficulty Favourite writing style The profile evolves over time. --# 7. Recommendation Types ## Personal Recommendations Books based on the user's behaviour. --## Similar Readers Readers with similar interests. --## Club Recommendations Book clubs matching user interests. --## Trending Recommendations Popular books adjusted to user interests. --## Hidden Gems
+
+Highly rated books with low popularity. --## Rediscovery Books previously saved but never read. --## Seasonal Recommendations Recommendations based on time of year. --## Reading Goal Recommendations Books matching reading goals. --# 8. Hybrid Recommendation Strategy BookHive combines multiple recommendation techniques. ## Content-Based Filtering Uses: Genres Authors Topics Tags Book metadata --## Collaborative Filtering
+
+Users with similar behaviour recommend books to one another. Example: Reader A enjoys: Atomic Habits Deep Work The Psychology of Money Reader B enjoys: Atomic Habits Deep Work  Recommend: The Psychology of Money --## Behaviour-Based Learning The system analyses: Reading speed Completion rate Favourite genres Reading frequency Review sentiment --## AI Reasoning Layer
+
+The AI analyses context beyond simple similarity. Example: "This reader enjoys practical books focused on habit formation and productivity. Recommend books that emphasise actionable frameworks." --# 9. Recommendation Pipeline User Action  Update User Profile  Update Behaviour Signals  Generate Candidate Books  Score Candidates  AI Reasoning  Rank Results  Store Recommendations  Display Feed
+
+--# 10. Recommendation Scoring Each recommendation receives a score. Example factors: Genre Match Author Match Popularity Review Quality Reading History Similarity Social Similarity Reading Goals Freshness Novelty Confidence Higher scores appear first. --# 11. Recommendation Feedback Loop Users can: Like recommendation Hide recommendation Save recommendation Read recommendation
+
+Ignore recommendation Each action improves future recommendations. --# 12. Reader Similarity Similarity is calculated using: Genres Authors Books read Ratings Reviews Reading pace Bookshelves Club memberships The result is a similarity score. --# 13. Club Recommendation Recommend clubs based on: Books Genres Activity level Club size Discussion topics
+
+Member similarity --# 14. Natural Language Search Users can search naturally. Examples: "I want a fantasy book with political intrigue." "Recommend books like Dune." "I want something uplifting under 300 pages." The AI translates queries into structured searches. --# 15. Reading Insights Examples "You read 5 books this month." "Your average completion rate is 92%." "You enjoy historical fiction." "You read more on weekends." These insights encourage engagement. --# 16. Discussion Prompts The AI generates prompts such as: "What did you think of the protagonist's decision?" "Which theme resonated most with you?"
+
+"Would you recommend this ending?" Used in clubs and reading sessions. --# 17. AI Provider Architecture BookHive must never depend directly on a single AI vendor. AIProvider  GrokProvider  RecommendationService Future providers: Gemini OpenAI Claude Local models Only one provider is active at a time. --# 18. Prompt Management Prompts should not be embedded in application code. Store prompts in dedicated prompt templates. Example: backend/
+
+src/ providers/ ai/ prompts/ recommendBooks.ts recommendReaders.ts discussionPrompts.ts search.ts This improves maintainability and testing. --# 19. Caching Strategy Cache: Recommendations Reader matches Club matches Natural language search Reading insights Reduce unnecessary AI requests. --# 20. AI Failure Strategy If the AI provider is unavailable: Fallback to:
+
+Trending books Content-based recommendations Cached recommendations The application should remain functional. --# 21. Privacy Never send unnecessary personal information to the AI provider. Sensitive data must never appear in prompts. Only transmit the minimum context required. --# 22. Analytics Track: Recommendation acceptance rate Recommendation click-through rate Books completed from recommendations Reader matches accepted Club joins from recommendations Search success rate These metrics help improve the recommendation engine over time. --# 23. Future AI Features AI Reading Coach
+
+Book Summaries Spoiler-free explanations Reading plans Learning paths Mood-based recommendations Voice assistant Reading challenge generation Personal reading reports --# 24. Ethical AI Principles The recommendation engine should: Avoid manipulation. Avoid unnecessary bias. Respect user privacy. Provide diverse recommendations. Avoid creating filter bubbles. Explain recommendations where practical. --# Final Principle The BookHive AI engine exists to help readers discover meaningful books, build lasting reading habits, and foster genuine human connections--not simply maximise engagement.
+
+

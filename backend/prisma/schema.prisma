@@ -139,3 +139,66 @@ model Follow {
   @@index([followerId])
   @@index([followingId])
 }
+
+model BookClub {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  coverImage  String?
+  visibility  String   @default("public")
+  ownerId     String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model ClubMember {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  clubId   String   @db.ObjectId
+  userId   String   @db.ObjectId
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
+
+  @@unique([clubId, userId])
+  @@index([clubId])
+  @@index([userId])
+}
+
+model ClubEvent {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  clubId      String   @db.ObjectId
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime?
+  videoRoomId String?
+  createdAt   DateTime @default(now())
+
+  @@index([clubId])
+}
+
+model ClubDiscussion {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  clubId      String   @db.ObjectId
+  authorId    String   @db.ObjectId
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clubId])
+  @@index([authorId])
+}
+
+model ClubComment {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  discussionId String   @db.ObjectId
+  authorId     String   @db.ObjectId
+  content      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([discussionId])
+  @@index([authorId])
+}

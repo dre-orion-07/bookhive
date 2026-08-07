@@ -111,12 +111,20 @@ function DashboardPage() {
         )}
 
         <div className="mt-10 pt-6 border-t border-(--color-border)">
-          <Link
-            to="/search"
-            className="inline-block rounded-lg bg-(--color-surface) border border-(--color-border) hover:border-(--color-primary) text-white text-sm font-medium px-4 py-2 transition"
-          >
-            Discover more books →
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              to="/search"
+              className="inline-block rounded-lg bg-(--color-surface) border border-(--color-border) hover:border-(--color-primary) text-white text-sm font-medium px-4 py-2 transition"
+            >
+              Discover more books
+            </Link>
+            <Link
+              to="/clubs"
+              className="inline-block rounded-lg bg-(--color-surface) border border-(--color-border) hover:border-(--color-primary) text-white text-sm font-medium px-4 py-2 transition"
+            >
+              Explore book clubs
+            </Link>
+          </div>
         </div>
       </div>
     </div>

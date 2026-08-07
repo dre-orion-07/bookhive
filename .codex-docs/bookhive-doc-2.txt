@@ -1,0 +1,1028 @@
+# 11 - Real-Time Communication Architecture
+Version: 1.0.0 Status: Active Project: BookHive
+---
+# 1. Purpose
+This document defines the real-time communication architecture for BookHive.
+It covers:
+- Live messaging - Presence - Notifications - Book club discussions - Video sessions - WebRTC signalling - Socket.IO events
+All real-time functionality must follow this specification.
+---
+# 2. Design Goals
+The real-time system must be:
+- Fast - Reliable - Secure - Scalable - Fault tolerant - Event-driven
+---
+# 3. Technologies
+Realtime Server
+Socket.IO
+
+Video & Audio
+
+WebRTC
+
+Backend
+
+Express.js
+
+Authentication
+
+JWT
+
+State Management
+
+Zustand
+
+---
+
+# 4. High-Level Architecture
+
+React Client
+
+
+
+Socket.IO Client
+
+
+
+WebSocket Connection
+
+
+
+Express + Socket.IO
+
+
+
+
+
+
+
+
+
+
+
+Presence Messaging Notifications
+
+
+
+
+
+
+
+
+
+
+
+MongoDB Atlas
+
+For video sessions:
+
+Browser A 
+WebRTC Peer 
+Socket.IO Signalling
+
+ WebRTC Peer
+ Browser B Socket.IO handles signalling only. Media streams travel directly between peers. --# 5. Authentication Every socket connection requires a valid JWT. Connection flow: Client  JWT Verification  Socket Authorised  Join Personal Room  Ready Unauthorised connections are rejected immediately. --# 6. Socket Rooms Each user automatically joins: user:{userId}
+
+Book clubs create rooms: club:{clubId} Conversations create rooms: conversation:{conversationId} Video sessions create rooms: video:{roomId} --# 7. Presence Track: Online Offline Last Seen Typing Active in Club In Video Session Presence updates should be lightweight. --# 8. Messaging Supported message types: Text Emoji Book Share
+
+Image (Future) File (Future) Voice Message (Future) Messages must support: Delivery status Read receipts Edited state Deleted state Message timestamps --# 9. Conversation Types Private Conversation Group Conversation Book Club Conversation Each conversation has: Participants Unread count Last message Last activity --# 10. Socket Events Client  Server
+
+auth:connect message:send message:edit message:delete typing:start typing:stop club:join club:leave video:join video:leave presence:update notification:read --Server  Client message:new message:edited message:deleted typing:update presence:update club:update notification:new video:userJoined
+
+video:userLeft recommendation:ready --# 11. Notifications Real-time notifications include: New follower New message Book recommendation Book club invitation Upcoming discussion Mention in chat Review liked Notifications are also persisted in MongoDB. --# 12. WebRTC Signalling Socket.IO exchanges: Offer Answer ICE Candidates Connection State Media never passes through the backend. ---
+
+# 13. Video Sessions Capabilities: Join room Leave room Camera on/off Microphone on/off Mute participants (moderators) Raise hand (Future) Screen sharing (Future) Recording (Future) --# 14. Book Club Live Sessions Flow: Scheduled Event  Reminder Notification  Join Video Room  Live Discussion  Session Ends
+
+ Discussion Summary (Future AI) --# 15. Error Handling Socket errors include: Unauthorised Room not found Message validation failed Rate limit exceeded Network interruption Reconnect failed Clients should retry where appropriate. --# 16. Reconnection Strategy Automatic reconnect Exponential backoff Restore subscriptions Restore room membership Resynchronise unread messages --# 17. Rate Limiting Limit:
+
+Messages Typing events Presence updates Room joins Notification acknowledgements Protect against spam and abuse. --# 18. Security Validate every socket payload using Zod. Never trust client data. Verify permissions before: Joining rooms Sending messages Editing messages Deleting messages Starting video sessions --# 19. Scalability Future scaling strategy: Redis Adapter for Socket.IO Horizontal backend instances Sticky sessions where required
+
+Separate signalling service if needed This architecture should support large numbers of concurrent users. --# 20. Monitoring Track: Socket connections Disconnections Message throughput Latency Video session duration Connection failures Presence updates These metrics help diagnose performance issues. --# 21. Testing Test: Connection lifecycle Authentication Message delivery Room membership Presence updates Reconnection
+
+WebRTC signalling
+Error scenarios
+---
+# 22. Future Enhancements
+Voice channels
+Push-to-talk
+End-to-end encrypted messaging
+Screen sharing
+Session recording
+Live captions
+AI-generated meeting summaries
+Shared whiteboard
+---
+# Final Principle
+Real-time features should feel instantaneous, reliable, and unobtrusive, enabling readers to communicate naturally without distracting from the reading experience. # 12 - Security Architecture
+Version: 1.0.0 Status: Active Project: BookHive
+Standard: - OWASP Top 10 - OWASP ASVS - JWT Best Practices - OAuth 2.1
+---
+
+# 1. Purpose
+This document defines the security architecture for BookHive.
+It establishes the security principles, authentication model, authorization strategy, data protection mechanisms, API security, and operational practices that every feature must follow.
+Security is a core requirement--not an optional feature.
+---
+# 2. Security Principles
+BookHive follows these principles:
+- Least Privilege - Defense in Depth - Secure by Default - Zero Trust - Fail Securely - Privacy by Design - Principle of Least Knowledge
+---
+# 3. Threat Model
+Primary threats include:
+- Unauthorized access - Account takeover - Token theft - Credential stuffing - API abuse - XSS - CSRF - Injection attacks - Broken access control - Data leakage - File upload attacks - WebSocket abuse - AI prompt injection
+
+--# 4. Authentication Supported methods: - Email & Password - Google OAuth Authentication flow: User  Login  Credential Validation  JWT Issued  Authenticated Session  Protected API Access --# 5. Password Security Passwords must: Minimum 12 characters Be hashed with bcrypt Never be logged
+
+Never be returned in API responses Never be stored in plaintext --# 6. JWT Strategy Access Token Short lifetime Refresh Token Long lifetime Refresh tokens are stored hashed in MongoDB. Revoked tokens are rejected. --# 7. Authorization Every protected resource requires ownership verification. Examples: A user may edit:
+ Their profile  Another user's profile
+A user may delete:
+ Their review  Another user's review
+Never trust client-side authorization. ---
+
+# 8. API Security Every endpoint must: Validate request body Validate query Validate params Authenticate user Authorise action Return standardised errors Log security events --# 9. Input Validation All incoming data is validated using Zod. Validation includes: Length Format Required fields Allowed values Data types No controller should receive unvalidated input. --# 10. Output Encoding Escape user-generated content before rendering.
+
+Protect against: Cross-Site Scripting (XSS) Never render raw HTML unless explicitly sanitised. --# 11. Rate Limiting Protect: Authentication endpoints Search AI endpoints Chat Reviews Recommendations Different endpoints may use different limits. --# 12. CORS Policy Allow only trusted origins. Credentials enabled only where required. Reject unknown origins in production. --# 13. Environment Variables Secrets must never be committed. Required secrets include:
+
+DATABASE_URL JWT_SECRET JWT_REFRESH_SECRET GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET CLOUDINARY credentials GROK_API_KEY All secrets are loaded through environment variables. --# 14. File Upload Security Uploads are restricted to: Images only Allowed formats: PNG JPEG WEBP Maximum file size enforced. Uploads are scanned and validated before persistence. Store files in Cloudinary. Never execute uploaded files. --# 15. AI Security
+
+Never send: Passwords JWTs Personal identifiers Sensitive metadata to the AI provider. Prompt templates must be controlled by the backend. User prompts should be sanitised to reduce prompt injection risks. --# 16. Database Security Use Prisma ORM exclusively. Never expose raw database queries. Indexes should minimise unnecessary data scans. Database credentials must remain private. --# 17. WebSocket Security Every socket connection requires JWT validation. Validate every event payload using Zod. Verify room permissions before allowing users to join. Disconnect unauthorised clients immediately. --# 18. Logging
+
+Log: Failed logins Successful logins OAuth events Token refreshes Account deletion Suspicious activity Never log: Passwords JWTs Refresh tokens API keys Sensitive personal information --# 19. Error Handling Errors should never expose: Database structure Stack traces Environment variables Secrets Internal implementation details Clients receive generic messages.
+
+Detailed logs remain server-side. --# 20. Security Headers Enable secure HTTP headers including: Content Security Policy (CSP) X-Content-Type-Options Referrer-Policy Permissions-Policy X-Frame-Options Strict-Transport-Security (HTTPS) --# 21. Session Security Invalidate refresh tokens on logout. Support logout from all devices (future). Automatically expire inactive sessions. --# 22. Privacy Collect only the data necessary for application functionality. Users should be able to: View their data Update their data Delete their account
+
+Request data export (future) BookHive should comply with applicable privacy regulations as the product evolves. --# 23. Dependency Security Dependencies should: Be actively maintained Be regularly updated Be scanned for known vulnerabilities Unused dependencies should be removed. --# 24. Monitoring Monitor: Repeated login failures Rate limit violations Suspicious API usage Repeated socket failures Unexpected AI usage patterns Security events should be centrally logged. --# 25. Incident Response If a security incident occurs: Identify
+
+Contain Investigate Mitigate Recover Document Review Improve Every incident should produce a post-incident report. --# 26. Security Testing Security testing should include: Authentication tests Authorization tests Input validation tests Rate limiting tests File upload tests WebSocket security tests AI prompt injection tests Dependency vulnerability scans --# 27. Future Security Enhancements Multi-factor authentication (MFA)
+
+Passkeys (WebAuthn)
+Device management
+Login history
+Trusted devices
+End-to-end encrypted messaging
+Hardware security keys
+Risk-based authentication
+---
+# Final Principle
+Every feature must be designed with security in mind from the beginning. No functionality should compromise user privacy, application integrity, or system reliability. # 13 - Testing Strategy
+Version: 1.0.0 Status: Active Project: BookHive
+Standards
+- Testing Pyramid - Test-Driven Thinking (where appropriate) - Shift Left Testing - Continuous Integration
+---
+# 1. Purpose
+This document defines the testing strategy for BookHive.
+The objective is to ensure that every feature is:
+- Correct - Reliable
+
+- Secure - Maintainable - Production-ready
+Testing is a development activity, not a post-development activity.
+---
+# 2. Testing Philosophy
+BookHive follows these principles:
+- Test behaviour, not implementation. - Prefer automated testing. - Prevent regressions. - Keep tests deterministic. - Keep tests fast. - Every bug should result in a new test. - Tests should be readable and maintainable.
+---
+# 3. Testing Pyramid
+End-to-End 
+Integration Tests 
+Unit Tests
+Approximate distribution:
+- Unit Tests: 70% - Integration Tests: 20% - End-to-End Tests: 10%
+---
+# 4. Testing Stack
+Frontend
+- Vitest - React Testing Library
+
+- MSW (Mock Service Worker)
+Backend
+- Vitest - Supertest
+End-to-End
+- Playwright
+API Testing
+- Supertest
+Performance
+- k6 (future)
+Accessibility
+- axe-core
+---
+# 5. Unit Testing
+Every unit test should verify a single behaviour.
+Examples:
+- Utility functions - Custom hooks - React components - Validation schemas - Services - Recommendation scoring - Helper functions
+Unit tests should not require a database or network.
+---
+# 6. Integration Testing
+
+Integration tests verify interaction between modules.
+Examples:
+- API  Database - Controller  Service - Service  Repository - Authentication middleware - Prisma integration - Cloudinary provider (mocked) - AI provider abstraction (mocked)
+---
+# 7. End-to-End Testing
+Critical user journeys must be tested.
+Examples:
+- Register account - Login - Complete onboarding - Search for books - Add a book to library - Update reading progress - Write a review - Follow another reader - Join a book club - Send a message - Join a video discussion - Logout
+E2E tests should reflect real user behaviour.
+---
+# 8. API Testing
+Every endpoint must verify:
+- Success responses - Validation failures
+
+- Authentication - Authorization - Rate limiting - Error handling - Edge cases
+---
+# 9. AI Testing
+The AI layer should be tested independently.
+Verify:
+- Prompt generation - Provider abstraction - Recommendation ranking - Fallback behaviour - Error handling - Response parsing - Caching
+AI providers should be mocked during automated tests.
+---
+# 10. Real-Time Testing
+Verify:
+- Socket authentication - Room joining - Presence updates - Message delivery - Read receipts - Reconnection - WebRTC signalling
+Real-time tests should cover both success and failure scenarios.
+---
+# 11. Database Testing
+
+Verify:
+- Prisma models - Relations - Constraints - Index usage - Soft deletes - Transactions (if introduced) - Data integrity
+Tests should use an isolated test database.
+---
+# 12. Component Testing
+Reusable UI components should verify:
+- Rendering - User interactions - Keyboard navigation - Accessibility - Loading states - Error states - Responsive behaviour where applicable
+---
+# 13. Accessibility Testing
+Verify:
+- Keyboard navigation - Focus management - Colour contrast - ARIA labels - Screen reader compatibility - Semantic HTML
+Target WCAG 2.2 AA compliance.
+---
+# 14. Performance Testing
+
+Monitor:
+- Initial page load - API latency - Search response time - Recommendation generation - Bundle size - Largest Contentful Paint (LCP) - Interaction to Next Paint (INP) - Cumulative Layout Shift (CLS)
+---
+# 15. Security Testing
+Verify:
+- Authentication - Authorization - Input validation - JWT handling - Rate limiting - File upload restrictions - XSS protection - Injection resistance
+---
+# 16. Regression Testing
+Every resolved bug should include:
+- A regression test - Documentation of the root cause - Verification that similar behaviour is protected
+---
+# 17. Test Data
+Use:
+- Seeded fixtures
+
+- Mock data - Factories - Builders Avoid relying on production data. Tests must be deterministic. --# 18. Mocking Strategy Mock external services: - Grok API - Google OAuth - Cloudinary - Email provider - Third-party APIs Do not mock internal business logic unless required for isolation. --# 19. Code Coverage Minimum targets: Overall: 85% Services: 90% Utilities: 95% Critical authentication flows: 100% Coverage is a quality indicator, not a goal in itself. --# 20. Continuous Integration Every pull request must:
+
+- Install dependencies with pnpm - Run linting - Run type checking - Run unit tests - Run integration tests - Run accessibility checks - Build frontend - Build backend
+No pull request may be merged if required checks fail.
+---
+# 21. Quality Gates
+A feature is considered complete only if:
+ Requirements implemented
+ Tests added
+ Lint passes
+ TypeScript passes
+ Accessibility checks pass
+ Documentation updated
+ Code review approved
+ Build succeeds
+---
+# 22. Folder Structure
+Frontend
+tests/
+unit/
+integration/
+
+e2e/
+Backend
+tests/
+unit/
+integration/
+api/
+realtime/
+shared/
+Fixtures and helpers should be reusable across test suites.
+---
+# 23. Future Enhancements
+- Visual regression testing - Cross-browser automation - Mobile device testing - Load testing - Chaos engineering - Contract testing - Mutation testing
+---
+# Final Principle
+Every feature must be accompanied by meaningful automated tests that verify behaviour, prevent regressions, and provide confidence for future development. # 14 - Deployment & DevOps
+Version: 1.0.0 Status: Active Project: BookHive
+---
+
+# 1. Purpose
+This document defines the deployment strategy, environments, CI/CD pipeline, infrastructure, release process, monitoring, and operational practices for BookHive.
+The objective is to ensure deployments are:
+- Reliable - Repeatable - Secure - Observable - Low-risk
+---
+# 2. Deployment Philosophy
+BookHive follows:
+- Infrastructure as Code where practical - Continuous Integration - Continuous Delivery - Immutable deployments - Environment isolation - Automated quality checks
+Deployments should require minimal manual intervention.
+---
+# 3. Environments
+## Development
+Purpose
+Local development.
+Characteristics
+- Local MongoDB or MongoDB Atlas Development Cluster - Local Express server - Local React application
+
+- Mock external services where appropriate
+---
+## Staging
+Purpose
+Pre-production verification.
+Characteristics
+- Mirrors production configuration - Connected to staging database - Used for QA - Used for user acceptance testing
+---
+## Production
+Purpose
+Live application.
+Characteristics
+- Optimised build - HTTPS only - Monitoring enabled - Production database - Production Cloudinary account - Production AI credentials
+---
+# 4. Recommended Hosting
+## Frontend
+Vercel
+Reasons
+
+- Excellent React support - Global CDN - Automatic deployments - Preview deployments - Fast edge delivery
+---
+## Backend
+Railway
+Reasons
+- Excellent Node.js support - Simple deployments - Easy environment variable management - Affordable - Automatic HTTPS
+Alternative
+Render
+---
+## Database
+MongoDB Atlas
+---
+## File Storage
+Cloudinary
+---
+# 5. Repository Strategy
+Single GitHub repository.
+pnpm Workspace.
+
+Structure frontend/ backend/ docs/ packages/ --# 6. Environment Variables Frontend VITE_API_URL VITE_GOOGLE_CLIENT_ID Backend DATABASE_URL JWT_SECRET JWT_REFRESH_SECRET GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET CLOUDINARY_CLOUD_NAME CLOUDINARY_API_KEY CLOUDINARY_API_SECRET GROK_API_KEY NODE_ENV PORT
+
+No secrets should exist in source control. --# 7. CI Pipeline Every pull request should automatically execute: Install dependencies  Type check  ESLint  Unit tests  Integration tests  Accessibility tests  Build frontend  Build backend  Success Only successful builds may be merged.
+
+--# 8. CD Pipeline Merge into main  GitHub Actions  Deploy Frontend  Deploy Backend  Health Check  Deployment Complete If health checks fail, deployment should be marked as unsuccessful. --# 9. Build Process Frontend pnpm build Backend pnpm build Artifacts should be reproducible across environments. ---
+
+# 10. Versioning Semantic Versioning (SemVer) MAJOR.MINOR.PATCH Examples 1.0.0 1.1.0 1.1.1 Breaking changes require a major version increment. --# 11. Release Strategy Development  Pull Request  Code Review  CI Validation  Merge to Main  Automatic Deployment 
+
+Production Verification --# 12. Database Migrations Prisma manages schema changes. Every schema update must: Generate migration Review migration Apply to staging Verify Apply to production Never modify production data manually. --# 13. Backups MongoDB Atlas automated backups enabled. Backup strategy Daily backups Point-in-time recovery where available Periodic restore verification --# 14. Monitoring Monitor - API availability - Response times
+
+- Error rates - AI provider availability - Socket connections - Database health - Memory usage - CPU usage --# 15. Logging Centralised logging should include: Authentication events API errors AI requests WebSocket events Unhandled exceptions Deployment events Logs must never contain sensitive data. --# 16. Health Checks Endpoints GET /health GET /health/database GET /health/storage GET /health/ai These endpoints should be used by deployment platforms and monitoring systems. ---
+
+# 17. Rollback Strategy If deployment fails: Detect failure  Stop rollout  Restore previous deployment  Investigate  Fix  Redeploy Rollbacks should be fast and predictable. --# 18. Disaster Recovery Recovery priorities 1. Restore application 2. Restore database 3. Restore uploaded assets 4. Verify integrity 5. Resume service Recovery procedures should be documented and periodically reviewed. ---
+
+# 19. Security in Deployment Production deployments must: Use HTTPS Use secure environment variables Disable debug mode Enable security headers Restrict CORS Enable rate limiting Rotate secrets when necessary --# 20. GitHub Actions Suggested workflows ci.yml deploy.yml security.yml dependency-update.yml Workflow files should live in: .github/workflows/ --# 21. Performance Optimisation Frontend - Code splitting
+
+- Lazy loading - Asset compression - Image optimisation - Browser caching Backend - Response compression - Efficient queries - Connection pooling - Request caching where appropriate --# 22. Dependency Management Use pnpm exclusively. Regularly update dependencies. Run security audits. Remove unused packages. --# 23. Documentation Deployment documentation should include: Environment setup Deployment checklist Rollback guide Monitoring guide Incident response Runbooks ---
+
+# 24. Future Enhancements Docker support Kubernetes deployment Redis caching Message queue Multi-region deployment Blue-Green deployment Canary releases CDN optimisation --# Final Principle Deployments should be automated, repeatable, observable, and reversible, enabling BookHive to evolve safely without compromising reliability or user trust. # 15 - Development Roadmap & Milestones Version: 1.0.0 Status: Active Project: BookHive --# 1. Purpose This roadmap defines the implementation strategy for BookHive. Development follows an incremental approach where each milestone delivers a stable, tested, and documented feature set. No phase should begin until the previous phase has been completed and verified. --# 2. Development Principles
+
+Every phase must:  Build successfully  Pass all tests  Pass linting  Pass TypeScript checks  Update documentation  Be reviewed before proceeding No unfinished work should be carried into the next milestone unless explicitly approved. --# 3. Milestone Overview Phase 0 -- Project Foundation  Phase 1 -- Authentication  Phase 2 -- User Profiles  Phase 3 -- Book Catalogue  Phase 4 -- Personal Library  Phase 5 -- Reviews & Ratings 
+
+Phase 6 -- AI Recommendation Engine  Phase 7 -- Social Features  Phase 8 -- Book Clubs  Phase 9 -- Real-Time Messaging  Phase 10 -- Video Discussions  Phase 11 -- Search & Discovery  Phase 12 -- Notifications  Phase 13 -- Performance & Optimisation  Phase 14 -- Production Readiness  Version 1.0 Release --# Phase 0 -- Project Foundation Objectives
+
+- Create pnpm workspace - Configure frontend (React + Vite + TypeScript) - Configure backend (Express + TypeScript) - Configure Prisma + MongoDB - Configure ESLint - Configure Prettier - Configure Husky - Configure lint-staged - Configure Vitest - Configure Playwright - Configure GitHub Actions - Configure environment variables - Create folder structure - Configure Tailwind CSS - Configure TanStack Query - Configure Zustand - Configure React Router
+Deliverables
+ Project boots successfully
+ CI passes
+ Shared tooling configured
+---
+# Phase 1 -- Authentication
+Objectives
+- Registration - Login - Google OAuth - JWT - Refresh tokens - Protected routes - User session management - Password reset foundation
+Deliverables
+
+ Secure authentication
+ Session persistence
+ Authentication tests
+---
+# Phase 2 -- User Profiles
+Objectives
+- Edit profile - Avatar upload - Favourite genres - Favourite authors - Reading goals - Privacy settings - User statistics
+Deliverables
+ Complete profile system
+---
+# Phase 3 -- Book Catalogue
+Objectives
+- Import books - Book details - Search - Categories - Filters - Similar books - Trending books
+Deliverables
+ Searchable catalogue
+ Responsive book pages
+
+---
+# Phase 4 -- Personal Library
+Objectives
+- User library - Bookshelves - Reading progress - Bookmarks - Reading history - Reading statistics
+Deliverables
+ Personal reading workspace
+---
+# Phase 5 -- Reviews & Ratings
+Objectives
+- Star ratings - Reviews - Review editing - Review deletion - Helpful votes
+Deliverables
+ Community review system
+---
+# Phase 6 -- AI Recommendation Engine
+Objectives
+- User behaviour tracking - Recommendation engine - Recommendation ranking - Reader similarity - Club recommendations
+
+- AI explanations - Recommendation feedback
+Deliverables
+ Personalised recommendation feed
+---
+# Phase 7 -- Social Features
+Objectives
+- Follow users - Reader profiles - Activity feed - Reader discovery - Reader matching
+Deliverables
+ Social network operational
+---
+# Phase 8 -- Book Clubs
+Objectives
+- Create clubs - Join clubs - Club management - Club discussions - Club events
+Deliverables
+ Community system complete
+---
+# Phase 9 -- Real-Time Messaging
+Objectives
+
+- Socket.IO integration - Private chat - Group chat - Typing indicators - Read receipts - Presence
+Deliverables
+ Real-time messaging
+---
+# Phase 10 -- Video Discussions
+Objectives
+- WebRTC integration - Join rooms - Camera controls - Microphone controls - Club discussion rooms
+Deliverables
+ Live discussion capability
+---
+# Phase 11 -- Search & Discovery
+Objectives
+- Global search - AI search - Reader search - Club search - Recommendation search
+Deliverables
+ Intelligent discovery experience
+
+---
+# Phase 12 -- Notifications
+Objectives
+- In-app notifications - Real-time notifications - Notification centre - Read/unread management
+Deliverables
+ Complete notification system
+---
+# Phase 13 -- Performance & Optimisation
+Objectives
+- Bundle optimisation - Lazy loading - Image optimisation - Database indexing - Query optimisation - Caching - Accessibility improvements
+Deliverables
+ Production-level performance
+---
+# Phase 14 -- Production Readiness
+Objectives
+- Security review - Documentation review - Final testing - Accessibility audit - Performance audit
+
+- Bug fixing - Deployment verification Deliverables  Release Candidate  Version 1.0 --# 4. Exit Criteria A phase is complete only if:  All planned features are implemented  Unit tests pass  Integration tests pass  End-to-end tests pass  No critical bugs remain  Documentation updated  Code reviewed  CI pipeline passes --# 5. Risk Management Potential risks include: - Third-party API downtime - AI provider limitations - Scope creep - Performance regressions - Security vulnerabilities - Technical debt
+
+Mitigation strategies should be documented as risks emerge.
+---
+# 6. Change Management
+Changes to the roadmap require:
+- Review - Impact assessment - Documentation update - Milestone adjustment
+Avoid introducing new features mid-phase unless they address critical issues.
+---
+# 7. Definition of Done
+A feature is complete when:
+- Requirements are implemented. - Tests are written and passing. - Accessibility requirements are met. - Documentation is updated. - Code is reviewed. - No known critical defects remain.
+---
+# 8. Post-Version 1 Roadmap
+Potential Version 2 features:
+- Mobile application - AI Reading Coach - Reading challenges - Achievement system - Premium subscriptions - Audiobook support - E-book reader - Offline mode - Push notifications - Multi-language support
+
+These features are intentionally excluded from Version 1 to maintain a focused scope.
+---
+# Final Principle
+Deliver small, stable, high-quality increments. Completing a well-tested milestone is more valuable than partially implementing multiple features. # 16 - Architecture Decision Records (ADR)
+Version: 1.0.0 Status: Active Project: BookHive
+---
+# Purpose
+Architecture Decision Records (ADRs) document important technical decisions made during the development of BookHive.
+Each ADR answers:
+- What decision was made? - Why was it made? - What alternatives were considered? - What are the consequences?
+ADRs are permanent historical records.
+Once accepted, an ADR should not be edited significantly. If a decision changes, create a new ADR that supersedes the previous one.
+---
+# ADR Format
+Every ADR should follow this structure.
+---
+Title
+
+Status Accepted | Proposed | Superseded | Deprecated Date Decision Context Alternatives Considered Decision Outcome Consequences Future Considerations --# ADR-001 Title Use a Monorepo with pnpm Workspaces Status Accepted Context BookHive contains a frontend, backend, shared packages, and extensive documentation. Alternatives Considered - Separate repositories - npm Workspaces - Turborepo - Nx Decision Use a single Git repository with pnpm Workspaces.
+
+Reasons
+- Simplified dependency management - Shared TypeScript configuration - Shared UI components - Shared types - Easier onboarding - Faster development workflow
+Consequences
+Positive
+- Easier code sharing - Single source of truth - Simplified version control
+Negative
+- Larger repository size - Requires clear project organisation
+---
+# ADR-002
+Title
+React + Vite Instead of Next.js
+Status
+Accepted
+Context
+The application is primarily a client-side experience and does not require server-side rendering for Version 1.
+Alternatives Considered
+- Next.js - Remix
+
+- Astro
+Decision
+Use React with Vite and React Router.
+Reasons
+- Faster development experience - Simpler architecture - Excellent TypeScript support - Smaller deployment footprint - Lower complexity
+Consequences
+Positive
+- Fast local development - Simpler routing - Reduced cognitive overhead
+Negative
+- No built-in SSR - SEO improvements may require future consideration
+---
+# ADR-003
+Title
+Express.js Backend
+Status
+Accepted
+Decision
+Use Express.js as the backend framework.
+Reasons
+
+- Mature ecosystem - Large community - Flexible architecture - Excellent middleware support
+Alternatives
+- Fastify - NestJS - Hono
+---
+# ADR-004
+Title
+MongoDB with Prisma ORM
+Status
+Accepted
+Decision
+Use MongoDB Atlas with Prisma ORM.
+Reasons
+- Flexible document model - Strong TypeScript integration - Developer productivity - Simplified data access
+Alternatives
+- PostgreSQL - MySQL - Firebase
+---
+# ADR-005
+
+Title Google OAuth as Primary Social Login Status Accepted Decision Support Google OAuth only in Version 1. Reasons - Simpler implementation - Reduced maintenance - Most widely used provider - Meets project requirements Future Consideration GitHub, Apple, and Microsoft authentication may be added later. --# ADR-006 Title Cloudinary for Media Storage Status Accepted Decision Store uploaded media in Cloudinary. Reasons - Generous free tier - Automatic image optimisation
+
+- CDN delivery - Easy integration
+Alternatives
+- AWS S3 - Firebase Storage - Supabase Storage
+---
+# ADR-007
+Title
+Grok as the Initial AI Provider
+Status
+Accepted
+Decision
+Use Grok through an abstract AI provider interface.
+Reasons
+- Lower operating costs - Modular provider architecture - Easy future replacement
+Alternatives
+- OpenAI - Claude - Gemini - Local models
+---
+# ADR-008
+Title
+
+Socket.IO for Real-Time Communication
+Status
+Accepted
+Decision
+Use Socket.IO for messaging, notifications, and WebRTC signalling.
+Reasons
+- Reliable reconnection - Event-based API - Broad community support
+Alternatives
+- Native WebSockets - SSE - MQTT
+---
+# ADR-009
+Title
+WebRTC for Video Discussions
+Status
+Accepted
+Decision
+Use peer-to-peer WebRTC connections for audio and video.
+Reasons
+- Low latency - Browser support - Reduced backend bandwidth - Industry standard
+
+--# ADR-010 Title JWT Authentication Status Accepted Decision Use JWT access tokens with refresh tokens. Reasons - Stateless API authentication - Widely adopted - Scalable - Mobile-friendly --# ADR-011 Title Zod for Runtime Validation Status Accepted Decision Use Zod for validating requests, environment variables, and shared schemas. Reasons - Strong TypeScript integration - Runtime validation
+
+- Schema reuse - Excellent developer experience
+Alternatives
+- Joi - Yup - class-validator
+---
+# ADR-012
+Title
+TanStack Query for Server State
+Status
+Accepted
+Decision
+Use TanStack Query for asynchronous server state.
+Reasons
+- Automatic caching - Background refetching - Mutation support - Reduced boilerplate
+Alternatives
+- SWR - RTK Query - Apollo Client
+---
+# ADR-013
+Title
+
+Zustand for Client State Status Accepted Decision Use Zustand for lightweight client-side state. Reasons - Minimal API - Excellent performance - No unnecessary complexity Alternatives - Redux Toolkit - Recoil - Jotai --# ADR-014 Title Tailwind CSS for Styling Status Accepted Decision Use Tailwind CSS with reusable design tokens. Reasons - Rapid UI development - Consistent design - Excellent ecosystem
+
+Alternatives - CSS Modules - Styled Components - Emotion --# ADR-015 Title Feature-Based Project Structure Status Accepted Decision Organise the codebase by feature rather than by technical layer. Reasons - Better scalability - Improved discoverability - Reduced coupling - Easier maintenance --# ADR-016 Title Professional Documentation-First Development Status Accepted Decision Complete architecture and engineering documentation before implementation.
+
+Reasons
+- Reduces ambiguity - Enables AI-assisted development - Improves planning - Produces consistent implementations - Simplifies onboarding
+---
+# Future ADRs
+New ADRs should be created for decisions such as:
+- Redis integration - Search engine adoption - Mobile application architecture - Offline support - Premium subscription model - AI provider migration - Event-driven architecture - Analytics platform - Internationalisation - Docker adoption
+---
+# ADR Lifecycle
+Proposed
+
+Review
+
+Accepted
+
+Implemented
+
+
+Maintained
+
+Superseded (if necessary)
+Historical ADRs should never be deleted.
+---
+# Final Principle
+Architectural decisions should be intentional, documented, and traceable. Every significant technical choice should have a recorded rationale so future contributors understand not only what was built, but why it was built. # 17 - Git Workflow & Contribution Guide
+Version: 1.0.0 Status: Active Project: BookHive
+---
+# 1. Purpose
+This document defines the Git workflow, branching strategy, commit conventions, pull request process, code review standards, and contribution guidelines for BookHive.
+The objectives are:
+- Maintain a clean Git history - Encourage small, focused changes - Simplify collaboration - Improve code quality - Reduce merge conflicts
+---
+# 2. Development Workflow
+Feature Request
+
+ Create Branch  Implement Feature  Run Local Quality Checks  Commit Changes  Push Branch  Open Pull Request  Code Review  CI Validation  Merge to Main  Automatic Deployment Every change follows this workflow. ---
+
+# 3. Branching Strategy Main Branch main Always deployable. Protected branch. --Development Branch (Optional) develop Used if multiple major features are developed simultaneously. For Version 1, development may occur directly through feature branches into main. --Feature Branches Naming convention: feature/<feature-name> Examples: feature/authentication feature/book-search feature/recommendations feature/reading-progress feature/book-clubs --Bug Fix Branches
+
+bugfix/<issue> Examples bugfix/login-refresh bugfix/review-edit --Hotfix Branches hotfix/<issue> Examples hotfix/oauth-crash hotfix/security-patch Reserved for urgent production fixes. --Documentation Branches docs/<topic> Examples docs/api docs/architecture docs/testing --Refactoring Branches refactor/<feature> Examples
+
+refactor/library-service refactor/socket-events --# 4. Branch Rules Every branch should: Focus on one feature or fix. Remain small and reviewable. Stay up to date with main. Be deleted after merging. --# 5. Commit Message Standard BookHive follows the Conventional Commits specification. Format type(scope): description Examples feat(auth): add Google OAuth login feat(search): implement book filters fix(chat): resolve duplicate messages docs(api): update recommendation endpoints refactor(ai): simplify ranking engine style(ui): improve spacing consistency test(auth): add refresh token tests
+
+build(ci): update GitHub Actions workflow chore(deps): upgrade Prisma --# 6. Commit Types feat New functionality fix Bug fix docs Documentation only style Formatting or styling changes refactor Internal code improvement perf Performance improvement test Testing changes build Build system changes ci Continuous integration updates
+
+chore Maintenance tasks revert Revert previous commit --# 7. Pull Requests Every PR must include: Title Summary Reason for change Testing performed Screenshots (if UI changed) Related issue (if applicable) Documentation updates Checklist completion --# 8. Pull Request Checklist Before requesting review:  TypeScript passes  ESLint passes  Tests pass  Documentation updated
+
+ No console errors  No TODO comments left unintentionally  No secrets committed  Accessibility considered --# 9. Code Review Standards Reviewers should verify: Correctness Readability Performance Security Accessibility Maintainability Consistency Documentation Tests Constructive feedback is encouraged. --# 10. Merge Strategy Use: Squash and Merge Reasons
+
+- Cleaner Git history - One commit per feature - Easier rollbacks - Better release notes Avoid merge commits unless necessary. --# 11. Protected Branch Rules The main branch requires: Passing CI Approved review No merge conflicts Up-to-date branch Successful build No direct pushes --# 12. Local Quality Checks Before every commit: pnpm lint  pnpm typecheck  pnpm test  pnpm build
+
+Only commit if all checks pass. --# 13. Git Hooks Use Husky. Pre-commit - Format staged files - Run ESLint - Run TypeScript checks (staged scope where practical) Pre-push - Run unit tests - Prevent pushes with failing tests --# 14. Code Ownership Future enhancement: Assign ownership for: Frontend Backend AI Engine Documentation Infrastructure For Version 1, all code is maintained by the project owner. --# 15. Issue Tracking
+
+Every issue should include: Title Description Expected behaviour Actual behaviour Steps to reproduce Environment Priority Screenshots (if applicable) --# 16. Labels Suggested labels: bug feature enhancement documentation security performance ui backend frontend ai
+
+testing good first issue help wanted --# 17. Release Workflow Feature Complete  Testing Complete  Documentation Updated  Release Tag  Deployment  Verification  Release Notes --# 18. Changelog Maintain a CHANGELOG.md following Keep a Changelog principles. Sections
+
+Added Changed Deprecated Removed Fixed Security Every release updates the changelog. --# 19. Repository Standards Required files: README.md LICENSE .gitignore .editorconfig .prettierrc .eslintrc CONTRIBUTING.md CODE_OF_CONDUCT.md (future if open source) SECURITY.md CHANGELOG.md --# 20. Dependency Updates
+
+Update dependencies regularly. Before upgrading: Review release notes. Run tests. Verify builds. Update documentation if necessary. --# 21. Conflict Resolution Resolve merge conflicts by: Understanding both changes. Avoiding automatic conflict resolution without review. Running all tests after resolving conflicts. --# 22. Future Open Source Readiness If BookHive becomes open source: Adopt GitHub Discussions. Publish contribution guidelines. Use issue templates. Use pull request templates. Enable automated labelling. Recognise contributors. ---
+
+# Final Principle
+Every commit should leave the repository in a better state than it was found. Clean history, thoughtful reviews, and consistent workflows are essential to maintaining a high-quality codebase. # 18 - Performance & Optimisation Guide
+Version: 1.0.0 Status: Active Project: BookHive
+---
+# 1. Purpose
+This document defines the performance strategy for BookHive.
+Its objectives are:
+- Fast initial load - Responsive UI - Efficient APIs - Optimised database queries - Scalable real-time communication - Low AI response latency - Excellent Core Web Vitals
+Performance is considered a feature, not an afterthought.
+---
+# 2. Performance Principles
+BookHive follows these principles:
+- Measure before optimising - Avoid premature optimisation - Optimise user-perceived performance - Reduce unnecessary work - Cache intelligently - Load only what is needed
+---
+
+# 3. Performance Budgets Frontend Initial JS Bundle Target: < 250 KB (gzipped) Lazy Loaded Chunks < 100 KB Images Responsive Compressed WebP/AVIF preferred API Response Average < 300 ms AI Requests Target < 5 seconds Real-Time Messaging Latency < 150 ms --# 4. Core Web Vitals Targets
+
+Largest Contentful Paint (LCP) < 2.5 seconds Interaction to Next Paint (INP) < 200 ms Cumulative Layout Shift (CLS) < 0.1 Time to First Byte (TTFB) < 800 ms These metrics should be monitored throughout development. --# 5. Frontend Optimisation React best practices: - Route-level code splitting - Lazy loading - Dynamic imports - Memoisation where beneficial - Avoid unnecessary re-renders - Optimise state updates - Minimise bundle size --# 6. Vite Optimisation Enable: Tree shaking Code splitting Minification
+
+Asset hashing Compressed builds Remove unused code from production bundles. --# 7. React Component Optimisation Avoid: Large parent components Prop drilling Excessive state Repeated calculations Prefer: Reusable components Memoised selectors Stable callbacks Derived state where appropriate --# 8. State Management Optimisation Zustand Use small stores. Separate unrelated concerns. Avoid one global store. TanStack Query
+
+Use for server state only. Configure: staleTime gcTime Retry policy Background refetching Prefetching --# 9. Routing Optimisation React Router Use lazy-loaded routes. Preload frequently visited pages when appropriate. Avoid loading all routes on startup. --# 10. Image Optimisation Cloudinary should provide: Automatic optimisation Responsive sizes Lazy loading Compression Modern formats Use placeholders while images load.
+
+--# 11. API Optimisation Guidelines: Return only required fields. Use pagination. Filter at the database level. Avoid over-fetching. Compress responses. Implement consistent error responses. --# 12. Database Optimisation MongoDB Create indexes for: Email Username Book ID Genre Recommendation lookups Conversation IDs Notification queries Review queries Analyse query performance periodically.
+
+--# 13. Prisma Optimisation Use: Field selection Projection Pagination Cursor-based pagination for large datasets Avoid unnecessary nested queries. Keep database interactions efficient. --# 14. AI Optimisation Minimise prompt size. Reuse prompt templates. Cache AI responses where appropriate. Batch similar requests when practical. Implement graceful fallbacks. Never block the UI while waiting for AI. --# 15. Recommendation Optimisation Recommendation generation should: Prioritise cached results. Refresh asynchronously.
+
+Avoid recalculating recommendations on every request. Update recommendation caches based on user activity. --# 16. Search Optimisation Debounce search input. Cache recent queries. Paginate results. Limit returned fields. Support incremental loading. Future enhancement: Dedicated search engine integration. --# 17. Real-Time Optimisation Socket.IO Reduce event payload size. Avoid unnecessary broadcasts. Batch updates where appropriate. Throttle typing indicators. Minimise presence updates. --# 18. Video Optimisation WebRTC
+
+Prefer peer-to-peer communication. Use adaptive bitrate. Support reconnects. Allow users to disable video for lower bandwidth. Future: Selective forwarding (SFU) if scaling requires it. --# 19. Caching Strategy Frontend TanStack Query cache Image cache Browser cache Backend Recommendation cache Search cache AI response cache Notification cache Future Redis cache --# 20. Background Processing Move non-critical work outside the request cycle.
+
+Examples: Recommendation refresh Notification generation Analytics aggregation Email delivery Future implementation may use a job queue. --# 21. Pagination Never return unlimited datasets. Use: Cursor pagination Infinite scrolling where appropriate Load more interactions --# 22. Monitoring Track: API latency Database latency AI latency Socket latency Bundle size Memory usage
+
+CPU usage Cache hit ratio Page load time --# 23. Accessibility Performance Performance improvements must not reduce accessibility. Examples: Maintain keyboard support. Preserve semantic HTML. Respect reduced motion preferences. Optimise without sacrificing usability. --# 24. Mobile Optimisation Prioritise: Touch interactions Reduced network usage Responsive images Smaller bundles Battery-efficient rendering Lower memory consumption --# 25. Performance Testing
+
+Run: Lighthouse Playwright performance checks Load testing (future) Stress testing (future) Benchmark critical user journeys before major releases. --# 26. Common Anti-Patterns Avoid: Fetching unnecessary data Rendering large lists without virtualisation Blocking the main thread Large synchronous operations Repeated API requests Duplicate AI calls Global state misuse Overusing memoisation without evidence --# 27. Future Optimisations Redis Background workers Message queues
+
+Search indexing Edge caching CDN optimisation Server-side rendering (if future requirements justify it) Offline caching Progressive Web App (PWA) --# 28. Performance Review Checklist Before releasing a feature:  Lighthouse score acceptable  Bundle impact reviewed  Database queries optimised  API responses measured  Images optimised  Accessibility preserved  No unnecessary re-renders  Performance tests pass --# Final Principle Performance should be continuously measured, monitored, and improved. Every optimisation should provide measurable value to users while preserving maintainability and accessibility. # 19 - Observability & Monitoring Version: 1.0.0
+
+Status: Active Project: BookHive
+---
+# 1. Purpose
+This document defines the observability strategy for BookHive.
+Observability enables developers to understand the health, behaviour, and performance of the application in production.
+The strategy covers:
+- Logging - Metrics - Monitoring - Tracing - Alerting - Health checks - Incident response
+---
+# 2. Objectives
+The monitoring platform should answer:
+- Is the application healthy? - Is the database healthy? - Is Grok responding? - Are Socket.IO connections stable? - Are users experiencing errors? - Which endpoints are slow? - Are recommendations succeeding?
+---
+# 3. Pillars of Observability
+BookHive follows the three pillars of observability.
+Logs
+
+ Metrics  Distributed Tracing Each pillar complements the others. --# 4. Logging Strategy Every log entry should include: Timestamp Log level Service Request ID User ID (if authenticated) Environment Message Logs should be structured JSON. --# 5. Log Levels DEBUG Development diagnostics INFO Normal application events
+
+WARN
+Unexpected but recoverable behaviour
+ERROR
+Application failures
+FATAL
+Application cannot continue
+Production should minimise DEBUG logging.
+---
+# 6. What to Log
+Authentication
+- Login - Logout - OAuth success - OAuth failure - Token refresh
+API
+- Request duration - Response status - Validation failures
+AI
+- Provider used - Response time - Fallback activation
+Realtime
+- Socket connections - Disconnections - Room joins - Video sessions
+
+Infrastructure - Deployments - Startup - Shutdown - Health checks --# 7. What Never to Log Passwords JWTs Refresh tokens API keys Cloudinary secrets OAuth secrets Environment variables Personally sensitive information --# 8. Metrics Track: API requests Request latency Error rate Database latency Recommendation latency
+
+AI response time Search latency Socket connections Video sessions Memory usage CPU usage Disk usage --# 9. Business Metrics Track: Daily active users Monthly active users Books added to libraries Books completed Reviews created Reader connections Book clubs created Messages sent Video sessions started Recommendation acceptance rate Average reading streak These metrics help evaluate product success.
+
+--# 10. AI Metrics Monitor: AI requests Success rate Failure rate Average response time Fallback usage Prompt execution time Recommendation acceptance Average recommendation confidence --# 11. Health Checks Endpoints GET /health Overall application status GET /health/database Database connectivity GET /health/storage Cloudinary connectivity GET /health/ai AI provider availability
+
+GET /health/realtime Socket.IO status Health endpoints should not expose sensitive details. --# 12. Error Tracking Capture: Unhandled exceptions Promise rejections API failures Socket failures Frontend runtime errors Store stack traces securely. --# 13. Performance Monitoring Monitor: Core Web Vitals API latency Query execution Memory consumption Slow endpoints Slow database queries Slow AI requests
+
+Largest bundle sizes --# 14. Distributed Tracing Assign a Request ID to every request. Request  Middleware  Controller  Service  Repository  External APIs  Response Tracing should make it easy to identify bottlenecks. --# 15. Alerting Critical alerts: Application unavailable
+
+Database unavailable AI provider unavailable High error rate Memory exhaustion CPU exhaustion Deployment failure Certificate expiry --# 16. Dashboard Recommended dashboards: Application Overview API Performance Database Health AI Health Socket.IO Activity Business Metrics Security Events Deployment Status --# 17. Incident Severity P1 Application unavailable
+
+P2 Major feature unavailable P3 Minor functionality degraded P4 Cosmetic or low-impact issue Each incident should have an owner. --# 18. Incident Response Identify  Assess  Contain  Investigate  Resolve  Verify  Document
+
+ Retrospective Every major incident should result in documented improvements. --# 19. Retention Application logs 30 days Security logs 90 days Audit logs 180 days Retention periods may evolve based on operational needs. --# 20. Uptime Goals Target availability 99.9% Planned maintenance should be communicated. Unexpected outages should trigger alerts immediately. --# 21. Recommended Tools Logging Pino
+
+Monitoring OpenTelemetry Error Tracking Sentry Uptime Monitoring Better Stack or UptimeRobot Analytics PostHog Infrastructure Monitoring Platform-native monitoring (Railway/Vercel) These tools should remain replaceable through abstraction where practical. --# 22. Deployment Monitoring Every deployment should verify: Application started Health endpoints pass Database connected AI provider reachable Socket.IO available No critical errors detected --# 23. Security Monitoring
+
+Track: Repeated failed logins Rate limit violations Unexpected token usage Suspicious API activity Abnormal AI request volume Repeated upload failures Potential abuse patterns --# 24. Future Enhancements Distributed tracing across services Synthetic monitoring Real User Monitoring (RUM) Anomaly detection AI-assisted incident analysis Capacity forecasting --# 25. Runbooks Create operational runbooks for: Application outage Database outage AI provider outage
+
+Deployment rollback
+High memory usage
+WebSocket failures
+Security incident
+Runbooks should provide step-by-step recovery procedures.
+---
+# Final Principle
+Observability should provide actionable insight into BookHive's behaviour, enabling rapid diagnosis, informed decision-making, and continuous improvement without compromising user privacy or system security. # 20 - Prompt Engineering Guide
+Version: 1.0.0 Status: Active Project: BookHive
+---
+# 1. Purpose
+This document defines how prompts are designed, stored, versioned, tested, and maintained within BookHive.
+Prompt engineering is considered part of the application's architecture and follows the same engineering standards as application code.
+Prompts must never be treated as hard-coded strings scattered throughout the codebase.
+---
+# 2. Design Principles
+Prompts should be:
+- Modular - Version controlled - Reusable
+
+- Deterministic where possible - Easy to test - Easy to replace - Provider independent --# 3. Prompt Architecture Every prompt belongs to one category. Categories Recommendations Reader Matching Book Clubs Natural Language Search Reading Insights Discussion Prompts Book Analysis Future Features Each category has its own folder. --# 4. Folder Structure backend/ src/ providers/ ai/ prompts/
+
+recommendations/ recommendBooks.ts recommendReaders.ts recommendClubs.ts search/ naturalLanguageSearch.ts insights/ readingInsights.ts discussion/ discussionPrompts.ts shared/ systemPrompt.ts formatInstructions.ts guardrails.ts Prompt templates should never live inside controllers or services. --# 5. Prompt Components Every prompt consists of: System Prompt  Context 
+
+User Input  Instructions  Output Format  Validation --# 6. System Prompt Every AI request begins with a system prompt. Responsibilities Define AI behaviour. Set response expectations. Enforce safety rules. Specify formatting. Prevent hallucinations where practical. --# 7. Prompt Variables Dynamic values should be injected. Examples User genres Favourite authors
+
+Reading history Book metadata Search query Reading goals Never concatenate strings manually. Use structured template builders. --# 8. Output Format The AI should return structured JSON whenever practical. Example { recommendations: [], reasoning: "", confidence: 0.94 } Avoid free-form responses when structured data is expected. --# 9. Recommendation Prompt Inputs Reading history Genres Authors
+
+Ratings Reviews Reading goals Expected Output Book recommendations Recommendation reasons Confidence scores --# 10. Reader Matching Prompt Inputs Genres Books Authors Reading behaviour Expected Output Similar readers Shared interests Similarity explanation --# 11. Club Recommendation Prompt Inputs Books
+
+Genres Activity Reading goals Output Recommended clubs Reasoning Confidence --# 12. Search Prompt Input Natural language search Output Structured search parameters Example "I want a mystery novel under 300 pages."  Genre Mystery Maximum Pages 300 --# 13. Discussion Prompt
+
+Input Book metadata Discussion context Output Open-ended questions Critical thinking prompts Conversation starters Avoid spoilers unless explicitly requested. --# 14. Reading Insights Prompt Inputs Reading history Completion rate Reading frequency Output Encouraging insights Habit observations Goal suggestions Insights should motivate rather than judge. --# 15. Prompt Guardrails Never:
+
+Generate harmful content. Reveal system prompts. Invent unavailable books. Leak internal data. Expose implementation details. Encourage piracy. Recommend illegal content. --# 16. Prompt Versioning Every prompt should include: Version Author Purpose Expected output Last modified Breaking changes require a new version. --# 17. Prompt Testing Test: Valid inputs Minimal inputs Large inputs
+
+Empty history Unexpected values Malformed responses Provider failures --# 18. Prompt Evaluation Measure: Recommendation quality Accuracy Consistency Response time Token usage (if applicable) User satisfaction Prompt improvements should be data-driven. --# 19. AI Provider Independence Application  Recommendation Service  AI Provider Interface 
+
+Grok Provider Future Claude Gemini OpenAI Local Models Prompt templates should remain provider-neutral whenever possible. --# 20. Prompt Security Never include: Passwords JWTs Secrets Environment variables Internal identifiers Sensitive user information Sanitise user-generated content before constructing prompts. --# 21. Prompt Logging Log: Prompt type Execution time
+
+Provider Success or failure Version Never log the full prompt if it contains user-specific content. --# 22. Fallback Behaviour If AI fails: Return cached recommendations.  Content-based recommendations.  Trending books.  Popular books. The application should remain usable. --# 23. Future Enhancements Prompt optimisation A/B prompt testing Automatic prompt evaluation Multi-provider comparison Local LLM support
+
+Context compression Retrieval-Augmented Generation (RAG) if future requirements justify it --# 24. Documentation Every prompt must document: Purpose Inputs Outputs Dependencies Expected behaviour Failure behaviour Version history --# Final Principle Prompts are production code. They should be versioned, reviewed, tested, documented, and continuously improved with the same discipline applied to the rest of the BookHive codebase. # 21 - Error Handling Standards Version: 1.0.0 Status: Active Project: BookHive --# 1. Purpose This document defines the error handling standards for BookHive. The objectives are to:
+
+- Provide consistent error responses - Improve debugging - Protect sensitive information - Enhance user experience - Simplify monitoring and logging
+Errors should be predictable, informative, and recoverable wherever possible.
+---
+# 2. Error Handling Principles
+BookHive follows these principles:
+- Fail fast - Handle errors at the appropriate layer - Never expose internal implementation details - Log errors centrally - Return meaningful messages to users - Maintain consistent response formats - Recover gracefully when possible
+---
+# 3. Error Categories
+Validation Errors
+- Invalid input - Missing fields - Schema validation failures
+Authentication Errors
+- Invalid credentials - Expired tokens - Missing authentication
+Authorization Errors
+- Insufficient permissions - Forbidden actions
+
+Business Logic Errors
+- Book already exists in library - Duplicate review - Invalid reading state
+Database Errors
+- Connection failures - Constraint violations - Query failures
+AI Errors
+- Provider unavailable - Timeout - Invalid response - Rate limiting
+Realtime Errors
+- Socket authentication failure - Room join failure - Message delivery failure
+External Service Errors
+- Google OAuth - Cloudinary - Email provider
+Unexpected Errors
+- Unhandled exceptions - Unknown runtime failures
+---
+# 4. Standard API Error Format
+Every API error must follow this structure.
+```json {
+
+"success": false, "error": {
+"code": "VALIDATION_ERROR", "message": "Favourite genre is required.", "details": [], "requestId": "req_123456", "timestamp": "2026-07-27T12:00:00.000Z" } } ```
+This structure must be used consistently across all endpoints.
+---
+# 5. HTTP Status Codes
+200 OK
+Successful request
+201 Created
+Resource created
+204 No Content
+Successful request with no response body
+400 Bad Request
+Invalid client input
+401 Unauthorized
+Authentication required
+403 Forbidden
+Permission denied
+404 Not Found
+Resource does not exist
+
+409 Conflict Business conflict 422 Unprocessable Entity Validation failure 429 Too Many Requests Rate limit exceeded 500 Internal Server Error Unexpected server failure 503 Service Unavailable Temporary outage Use standard HTTP semantics. --# 6. Error Codes Examples: VALIDATION_ERROR AUTHENTICATION_FAILED TOKEN_EXPIRED ACCESS_DENIED BOOK_NOT_FOUND USER_NOT_FOUND REVIEW_ALREADY_EXISTS BOOK_ALREADY_IN_LIBRARY
+
+AI_PROVIDER_UNAVAILABLE AI_TIMEOUT SOCKET_AUTH_FAILED DATABASE_ERROR INTERNAL_ERROR Error codes should remain stable even if messages change. --# 7. Backend Error Architecture Request  Validation  Controller  Service  Repository  Database  Response Errors should bubble to a central global error handler.
+
+Controllers should not contain complex error logic. --# 8. Global Error Middleware Express must implement a single global error handler. Responsibilities: - Catch uncaught exceptions - Format responses - Assign request IDs - Log errors - Hide sensitive information No controller should manually format error responses. --# 9. Validation Errors Use Zod for all validation. Return: Field name Validation message Expected value (where appropriate) Never return stack traces. --# 10. Authentication Errors Examples: Invalid login Expired JWT
+
+Missing refresh token Invalid Google OAuth token Responses should not reveal whether a username or email exists. --# 11. Authorization Errors Return: 403 Forbidden Generic message Avoid exposing permission implementation details. --# 12. Database Errors Catch: Connection failures Query failures Prisma exceptions Timeouts Convert database-specific errors into application-specific errors before returning responses. --# 13. AI Errors Handle: Timeouts Malformed responses
+
+Provider outages Rate limiting Fallback Strategy: Cached recommendations  Content-based recommendations  Trending books  Popular books The application should continue functioning whenever possible. --# 14. Cloudinary Errors Handle: Upload failures File size limits Unsupported formats Network failures Provide users with actionable feedback. --# 15. Google OAuth Errors Handle:
+
+Cancelled login Invalid tokens Expired sessions Provider downtime Provide retry guidance without exposing provider internals. --# 16. Socket.IO Errors Examples: Authentication failure Disconnected client Invalid room Failed event delivery Emit structured error events. Example: ```json {
+"type": "SOCKET_ERROR", "code": "ROOM_NOT_FOUND", "message": "The requested discussion room could not be found." } ``` --# 17. Frontend Error Handling React should implement: Error Boundaries
+
+Route-level error handling Async request error handling Graceful fallback UI Retry actions where appropriate The application should avoid blank screens. --# 18. Error Boundaries Catch: Component rendering failures Lifecycle exceptions Unexpected runtime errors Display: Friendly message Retry option Return to home option Unexpected errors should be reported to monitoring tools. --# 19. Logging Every error log should include: Timestamp Request ID User ID (if available)
+
+Service Severity Stack trace (server only) Environment Errors must never expose secrets. --# 20. Retry Strategy Retry only transient failures. Examples: AI timeout Network interruption Temporary database outage Avoid retrying validation or authentication failures. --# 21. User-Friendly Messages Internal Error "Prisma query failed."  User Message "Something went wrong while loading your library. Please try again." Users should never see technical implementation details. ---
+
+# 22. Security Never expose: Stack traces Database schema API keys JWT secrets Internal file paths Provider credentials Sanitise all error output. --# 23. Error Monitoring Report: Unhandled exceptions API failures AI failures Socket failures Frontend crashes Deployment failures Integrate with Sentry and structured logging. --# 24. Testing Verify:
+
+Validation failures Authentication failures Authorisation failures Database failures AI failures Socket failures Cloudinary failures Unexpected exceptions Every error path should have automated tests. --# 25. Folder Structure backend/ src/ shared/ errors/ AppError.ts ErrorCodes.ts ErrorFactory.ts error.middleware.ts frontend/ src/ shared/
+
+errors/ ErrorBoundary.tsx useApiError.ts ErrorMessage.tsx --# 26. Future Enhancements Automatic retry policies Error analytics AI-assisted debugging Self-healing background jobs Internationalised error messages Recovery workflows --# Final Principle Errors are part of the user experience. Every error should be predictable, secure, recoverable where possible, and provide enough context for developers to diagnose issues without exposing sensitive implementation details. # 22 - Coding Guidelines Version: 1.0.0 Status: Active Project: BookHive --# 1. Purpose This document defines the coding conventions, architectural patterns, naming rules, project organisation, and best practices for BookHive.
+
+All code generated for BookHive must follow these guidelines.
+Consistency is prioritised over personal preference.
+---
+# 2. General Principles
+Code should be:
+- Readable - Predictable - Testable - Reusable - Maintainable - Type-safe - Self-documenting
+Prefer clarity over cleverness.
+---
+# 3. Technology Stack
+Frontend
+- React 19 - TypeScript - Vite - React Router - Tailwind CSS - TanStack Query - Zustand - React Hook Form - Zod
+Backend
+- Node.js - Express - TypeScript - Prisma - MongoDB
+
+- JWT - Socket.IO
+Tooling
+- pnpm - ESLint - Prettier - Husky - lint-staged - Vitest - Playwright
+---
+# 4. TypeScript Rules
+Always use TypeScript.
+Never use:
+any
+Use:
+unknown
+Generics
+Discriminated unions
+Interfaces for object contracts
+Type aliases for utility types
+Enable strict mode.
+Avoid unnecessary type assertions.
+---
+# 5. Naming Conventions
+Variables
+
+camelCase Functions camelCase Components PascalCase Interfaces PascalCase No "I" prefix. Good UserProfile Bad IUserProfile Enums PascalCase Constants UPPER_SNAKE_CASE Files kebab-case.ts React Components PascalCase.tsx Folders kebab-case
+
+Environment Variables UPPER_SNAKE_CASE --# 6. Folder Organisation Organise by feature, not by technical layer. Example features/ authentication/ books/ recommendations/ library/ reviews/ book-clubs/ messages/ notifications/ Avoid large generic folders such as: components/ utils/ helpers/ unless shared across multiple features. --# 7. Imports
+
+Order imports as follows: 1. External packages 2. Internal packages 3. Feature modules 4. Relative imports 5. Types 6. Styles Use absolute imports where configured. Avoid deep relative paths. --# 8. React Components Prefer: Functional components Named exports Composition over inheritance Small focused components Avoid: Large components Nested conditional rendering Duplicated JSX Components should generally have one responsibility. ---
+
+# 9. React Hooks Custom hooks should: Start with use Contain reusable logic Avoid UI rendering Return strongly typed values Avoid side effects unrelated to their purpose. --# 10. State Management Use: Zustand Client UI state TanStack Query Server state React State Local component state Do not duplicate server state in Zustand. --# 11. Forms Use: React Hook Form +
+
+Zod Validation must exist on both frontend and backend. --# 12. API Layer Never call fetch directly from React components. Use: services/ or api/ All API communication should be abstracted. --# 13. Backend Architecture Request  Route  Controller  Service  Repository 
+
+Prisma  MongoDB Business logic belongs in services. Controllers remain thin. Repositories handle persistence. --# 14. Validation Validate: Environment variables Request body Params Query Socket events AI responses Use Zod everywhere possible. --# 15. Error Handling Never throw raw Error. Use custom AppError subclasses. Errors should bubble to the global error middleware. ---
+
+# 16. Async Code Always use: async/await Avoid: Nested promises Promise chains Unhandled promises Always handle rejections. --# 17. Functions Prefer: Small functions Single responsibility Pure functions where practical Avoid functions longer than approximately 40 lines unless justified. --# 18. Components Prefer: < 200 lines Split large components. Extract reusable UI. Separate business logic into hooks.
+
+--# 19. Comments Comments should explain: Why Not: What Bad Increment counter Good Prevent duplicate submissions during rapid clicks. Avoid commented-out code. --# 20. Documentation Every exported function should include JSDoc. Example /** * Returns personalised book recommendations. */ Document: Purpose Parameters Return value Exceptions
+
+--# 21. Logging Use the shared logger. Never use: console.log except during temporary debugging. Remove debug logging before merge. --# 22. Styling Use: Tailwind utilities Reusable design tokens Consistent spacing Responsive design Avoid inline styles. --# 23. Accessibility Every interactive element must: Be keyboard accessible Have accessible labels Support screen readers Maintain focus visibility
+
+Target WCAG 2.2 AA compliance. --# 24. Testing Every feature should include: Unit tests Integration tests E2E tests where appropriate Tests should verify behaviour rather than implementation details. --# 25. Security Never trust client input. Sanitise user content. Validate uploads. Escape unsafe output. Never expose secrets. Use HTTPS in production. --# 26. Performance Avoid: Unnecessary re-renders Large synchronous work Duplicate API requests
+
+Repeated AI calls Optimise only after measurement. --# 27. AI Integration Never call Grok directly from business logic. Always use: AIProvider  RecommendationService  Application Prompts should remain external to services. Validate all AI responses with Zod before use. --# 28. Real-Time Socket events should: Validate payloads Authenticate users Handle reconnection Use typed event contracts Keep payloads minimal. ---
+
+# 29. Prisma Keep queries: Small Efficient Explicit Select only required fields. Avoid unnecessary nested queries. Use transactions only when needed. --# 30. Git Every commit: Small Focused Descriptive Follow Conventional Commits. --# 31. Dependency Management Use pnpm exclusively. Do not mix package managers. Review new dependencies before installation. Remove unused packages promptly. ---
+
+# 32. Code Review Checklist Before submitting code:  Builds successfully  Lint passes  TypeScript passes  Tests pass  Documentation updated  Accessibility verified  No secrets committed  Performance considered --# 33. Anti-Patterns Avoid: God components God services Deep nesting Magic numbers Hard-coded strings Duplicate logic Circular dependencies Global mutable state Business logic in controllers
+
+Business logic in React components
+---
+# 34. Preferred Patterns
+Use:
+Dependency injection where appropriate
+Composition
+Reusable hooks
+Reusable services
+Provider pattern
+Repository pattern
+Factory pattern
+Strategy pattern (for AI providers)
+Adapter pattern (for external services)
+---
+# 35. Code Generation Rules for AI
+Claude AI must:
+- Generate production-ready code. - Never use placeholder implementations unless explicitly requested. - Never leave TODO comments for core functionality. - Follow the existing folder structure. - Reuse existing utilities before creating new ones. - Avoid duplicate code. - Update related documentation when behaviour changes. - Keep implementations small and modular. - Prefer extending existing modules over creating redundant ones. - Generate strongly typed code with no `any` usage.
+
+- Ensure all new code passes linting, type checking, and tests before considering a task complete.
+---
+# 36. Final Principle
+Every file should feel like it was written by the same engineering team. Consistency, simplicity, and maintainability always take precedence over clever or overly complex solutions.
+I want to introduce a Recommendation Engine Pipeline that separates AI from recommendation logic. Instead of the application asking Grok directly for recommendations, the flow should be:
+User Activity  
+Behaviour Tracker  
+Recommendation Engine   Content-Based Engine  Collaborative Engine  Popularity Engine  Freshness Engine  AI Reasoning Engine  
+Ranking Engine  
+Recommendation Feed
+This has several advantages:
+ The application still provides high-quality recommendations even if the AI provider is unavailable.
+ AI enhances recommendations rather than replacing established recommendation techniques.
+
+ New recommendation strategies can be added without changing the rest of the system.  The recommendation engine remains testable and deterministic where appropriate.
+This hybrid architecture is much closer to how production recommendation systems are built, and it will make BookHive a significantly stronger engineering project.
+Instead of placing all Socket.IO logic in a single socket.ts file, organise it as feature modules:
+backend/  src/
+ realtime/  index.ts  socket.ts  middleware/   authenticate.ts   rateLimit.ts  events/   chat.events.ts   club.events.ts   notification.events.ts   presence.events.ts   video.events.ts  services/   presence.service.ts   room.service.ts   messaging.service.ts  types/
+Benefits:
+ Clear separation of concerns.  Easier testing of individual event handlers.  Simpler maintenance as real-time features expand.  Better scalability when introducing additional event types.
+I recommend we add a dedicated Security Middleware Layer so every request passes through a consistent protection pipeline before reaching business logic.
+Incoming Request 
+
+ Helmet Security Headers
+  CORS Validation   Rate Limiter   Request Logger   JWT Authentication   Authorization Check   Zod Validation   Controller   Service   Repository
+This gives us:
+ Consistent security across all endpoints.  Reusable middleware.  Easier testing.  Easier maintenance.  Better compliance with OWASP recommendations.
+
+

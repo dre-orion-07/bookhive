@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { AppError } from "./AppError.js";
 
 export function errorMiddleware(err: unknown, _req: Request, res: Response, _next: NextFunction) {
+  void _next;
+
   const requestId = randomUUID();
   const timestamp = new Date().toISOString();
 

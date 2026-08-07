@@ -36,4 +36,7 @@ export const ErrorFactory = {
 
   reviewNotFound: (message = "Review not found.") =>
     new AppError(message, 404, ErrorCodes.REVIEW_NOT_FOUND),
+
+  clubNotFound: (message = "Book club not found.") =>
+    new AppError(message, 404, ErrorCodes.CLUB_NOT_FOUND),
 };

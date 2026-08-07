@@ -12,6 +12,7 @@ import bookshelvesRoutes from "./modules/bookshelves/bookshelves.routes.js";
 import reviewsRoutes from "./modules/reviews/reviews.routes.js";
 import recommendationsRoutes from "./modules/recommendations/recommendations.routes.js";
 import followsRoutes from "./modules/follows/follows.routes.js";
+import clubsRoutes from "./modules/clubs/clubs.routes.js";
 
 const app: Application = express();
 
@@ -26,6 +27,7 @@ app.use("/api/v1/bookshelves", bookshelvesRoutes);
 app.use("/api/v1/reviews", reviewsRoutes);
 app.use("/api/v1/recommendations", recommendationsRoutes);
 app.use("/api/v1/follow", followsRoutes);
+app.use("/api/v1/clubs", clubsRoutes);
 
 app.get("/api/v1/health", (_req, res) => {
   res.status(200).json({

@@ -11,6 +11,8 @@ import LibraryPage from "./library/LibraryPage";
 import BookshelvesPage from "./bookshelves/BookshelvesPage";
 import BookshelfDetailPage from "./bookshelves/BookshelfDetailPage";
 import DiscoverReadersPage from "./readers/DiscoverReadersPage";
+import ClubsPage from "./clubs/ClubsPage";
+import ClubDetailPage from "./clubs/ClubDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -85,6 +87,24 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <DiscoverReadersPage />
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/clubs",
+    element: (
+      <ProtectedRoute>
+        <ClubsPage />
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/clubs/:id",
+    element: (
+      <ProtectedRoute>
+        <ClubDetailPage />
       </ProtectedRoute>
     ),
   },
