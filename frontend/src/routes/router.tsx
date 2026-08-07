@@ -13,6 +13,8 @@ import BookshelfDetailPage from "./bookshelves/BookshelfDetailPage";
 import DiscoverReadersPage from "./readers/DiscoverReadersPage";
 import ClubsPage from "./clubs/ClubsPage";
 import ClubDetailPage from "./clubs/ClubDetailPage";
+import ConversationList from "./messaging/ConversationList";
+import ChatPage from "./messaging/ChatPage";
 
 export const router = createBrowserRouter([
   {
@@ -105,6 +107,23 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <ClubDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/messages",
+    element: (
+      <ProtectedRoute>
+        <ConversationList />
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/messages/:id",
+    element: (
+      <ProtectedRoute>
+        <ChatPage />
       </ProtectedRoute>
     ),
   },
