@@ -16,23 +16,25 @@ import ClubDetailPage from "./clubs/ClubDetailPage";
 import ConversationList from "./messaging/ConversationList";
 import ChatPage from "./messaging/ChatPage";
 import NotificationsPage from "../modules/notifications/NotificationsPage";
+import PublicProfilePage from "./users/PublicProfilePage";
+import OnboardingPage from "./onboarding/OnboardingPage";
+import SettingsPage from "./settings/SettingsPage";
 import AppLayout from "../shared/layouts/AppLayout";
 
 export const router = createBrowserRouter([
   {
     element: <AppLayout />,
     children: [
+      { path: "/", element: <LandingPage /> },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/register", element: <RegisterPage /> },
       {
-        path: "/",
-        element: <LandingPage />,
-      },
-      {
-        path: "/login",
-        element: <LoginPage />,
-      },
-      {
-        path: "/register",
-        element: <RegisterPage />,
+        path: "/onboarding",
+        element: (
+          <ProtectedRoute>
+            <OnboardingPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/dashboard",
@@ -59,13 +61,15 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/search",
-        element: <SearchPage />,
+        path: "/settings",
+        element: (
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        ),
       },
-      {
-        path: "/books/:id",
-        element: <BookDetailPage />,
-      },
+      { path: "/search", element: <SearchPage /> },
+      { path: "/books/:id", element: <BookDetailPage /> },
       {
         path: "/library",
         element: (
@@ -95,6 +99,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <DiscoverReadersPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/users/:username",
+        element: (
+          <ProtectedRoute>
+            <PublicProfilePage />
           </ProtectedRoute>
         ),
       },

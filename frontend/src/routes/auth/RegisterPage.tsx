@@ -31,7 +31,7 @@ function RegisterPage() {
     try {
       const result = await authService.register(values);
       setAuth(result.user, result.accessToken, result.refreshToken);
-      navigate("/dashboard");
+      navigate("/onboarding");
     } catch (err: unknown) {
       const message =
         err && typeof err === "object" && "response" in err

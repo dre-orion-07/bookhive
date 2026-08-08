@@ -2,7 +2,8 @@ import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { useAuthStore } from "../stores/authStore";
 import NotificationDropdown from "../../modules/notifications/NotificationDropdown";
 
-const AUTH_PATHS = new Set(["/login", "/register"]);
+// Routes that hide the navigation chrome entirely
+const NO_CHROME_PATHS = new Set(["/login", "/register", "/onboarding"]);
 
 const NAV_LINKS = [
   { to: "/dashboard", label: "Dashboard" },
@@ -12,13 +13,14 @@ const NAV_LINKS = [
   { to: "/readers", label: "Readers" },
   { to: "/messages", label: "Messages" },
   { to: "/profile", label: "Profile" },
+  { to: "/settings", label: "Settings" },
 ];
 
 export default function AppLayout() {
   const location = useLocation();
   const accessToken = useAuthStore((state) => state.accessToken);
 
-  const showChrome = Boolean(accessToken) && !AUTH_PATHS.has(location.pathname);
+  const showChrome = Boolean(accessToken) && !NO_CHROME_PATHS.has(location.pathname);
 
   return (
     <div className="min-h-screen bg-(--color-background) text-white">

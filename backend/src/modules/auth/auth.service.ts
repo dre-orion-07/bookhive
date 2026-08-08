@@ -41,6 +41,7 @@ export const authService = {
       },
       accessToken,
       refreshToken,
+      isNewUser: true,
     };
   },
 
