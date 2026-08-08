@@ -24,6 +24,9 @@ model User {
   isPrivateProfile Boolean @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+  notificationsSent     Notification[] @relation("NotificationActor")
+  notificationPreference NotificationPreference?
 }
 
 model Book {
@@ -257,6 +260,48 @@ model MessageRead {
   @@unique([messageId, userId])
   @@index([messageId])
   @@index([userId])
+}
+
+enum NotificationType {
+  MESSAGE
+  FOLLOW
+  REVIEW_COMMENT
+  DISCUSSION_REPLY
+  CLUB_JOIN
+  CLUB_EVENT
+  CLUB_DISCUSSION
+  SYSTEM
+}
+
+model Notification {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  recipientId String            @db.ObjectId
+  actorId     String?           @db.ObjectId
+  type        NotificationType
+  title       String
+  body        String
+  entityId    String
+  entityType  String
+  read        Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  recipient   User              @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor       User?             @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId])
+  @@index([recipientId, read])
+  @@index([createdAt])
+}
+
+model NotificationPreference {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  inApp     Boolean  @default(true)
+  email     Boolean  @default(false)
+  push      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model MessageAttachment {

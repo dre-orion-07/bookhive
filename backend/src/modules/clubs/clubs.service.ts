@@ -9,6 +9,7 @@ import type {
   CreateCommentInput,
   UpdateCommentInput,
 } from "./clubs.schema.js";
+import { notificationsService } from "../notifications/notifications.service.js";
 
 const MANAGER_ROLES = new Set(["owner", "moderator"]);
 const MONGO_OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
@@ -102,7 +103,9 @@ export const clubsService = {
       throw ErrorFactory.validation("You are already a member of this club.");
     }
 
-    return clubsRepository.addMember(clubId, userId, "member");
+    const membership = await clubsRepository.addMember(clubId, userId, "member");
+    await notificationsService.notifyClubJoin(clubId, userId);
+    return membership;
   },
 
   leave: async (clubId: string, userId: string) => {
@@ -143,12 +146,16 @@ export const clubsService = {
       throw ErrorFactory.validation("Event end time must be after the start time.");
     }
 
-    return clubsRepository.createEvent(clubId, {
+    const event = await clubsRepository.createEvent(clubId, {
       title: input.title,
       description: input.description,
       startTime,
       endTime,
     });
+
+    await notificationsService.notifyClubEvent(clubId, userId, input.title);
+
+    return event;
   },
 
   listUpcomingEvents: async (clubId: string, userId: string) => {
@@ -189,11 +196,15 @@ export const clubsService = {
     await getExistingClub(clubId);
     await requireMembership(clubId, userId);
 
-    return clubsRepository.createDiscussion(clubId, {
+    const discussion = await clubsRepository.createDiscussion(clubId, {
       authorId: userId,
       title: input.title,
       content: input.content,
     });
+
+    await notificationsService.notifyClubDiscussion(clubId, userId, input.title);
+
+    return discussion;
   },
 
   updateDiscussion: async (
@@ -266,10 +277,14 @@ export const clubsService = {
 
     await requireMembership(clubId, userId);
 
-    return clubsRepository.createComment(discussionId, {
+    const comment = await clubsRepository.createComment(discussionId, {
       authorId: userId,
       content: input.content,
     });
+
+    await notificationsService.notifyDiscussionReply(clubId, discussionId, userId, input.content);
+
+    return comment;
   },
 
   updateComment: async (

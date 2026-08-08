@@ -33,6 +33,10 @@ export function useGoogleSignIn(buttonId: string, onToken: (idToken: string) => 
   const initialized = useRef(false);
 
   useEffect(() => {
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return;
+    }
+
     const initializeGoogle = () => {
       if (!window.google) {
         setTimeout(initializeGoogle, 100);

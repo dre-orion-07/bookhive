@@ -14,6 +14,7 @@ import recommendationsRoutes from "./modules/recommendations/recommendations.rou
 import followsRoutes from "./modules/follows/follows.routes.js";
 import clubsRoutes from "./modules/clubs/clubs.routes.js";
 import messagingRoutes from "./modules/messaging/messaging.routes.js";
+import notificationsRoutes from "./modules/notifications/notifications.routes.js";
 
 const app: Application = express();
 
@@ -29,6 +30,7 @@ app.use("/api/v1/reviews", reviewsRoutes);
 app.use("/api/v1/recommendations", recommendationsRoutes);
 app.use("/api/v1/follow", followsRoutes);
 app.use("/api/v1/clubs", clubsRoutes);
+app.use("/api/v1/notifications", notificationsRoutes);
 app.use("/api/v1/messaging", messagingRoutes);
 
 app.get("/api/v1/health", (_req, res) => {

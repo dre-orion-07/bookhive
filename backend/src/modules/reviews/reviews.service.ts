@@ -3,6 +3,7 @@ import { reviewsRepository } from "./reviews.repository.js";
 import { booksRepository } from "../books/books.repository.js";
 import { ErrorFactory } from "../../shared/errors/ErrorFactory.js";
 import type { CreateReviewInput, UpdateReviewInput } from "./reviews.schema.js";
+import { notificationsService } from "../notifications/notifications.service.js";
 
 const prisma = new PrismaClient();
 
@@ -38,6 +39,7 @@ export const reviewsService = {
     });
 
     await recalculateBookRating(input.bookId);
+    await notificationsService.notifyNewReview(userId, input.bookId);
 
     return review;
   },

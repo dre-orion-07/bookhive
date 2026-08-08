@@ -1,6 +1,7 @@
 import repo from "./messaging.repository.js";
 import { PrismaClient } from "@prisma/client";
 import { ErrorFactory } from "../../shared/errors/ErrorFactory.js";
+import { notificationsService } from "../notifications/notifications.service.js";
 
 const prisma = new PrismaClient();
 
@@ -59,6 +60,12 @@ export default {
       throw ErrorFactory.accessDenied("You are not a member of this conversation.");
 
     const message = await repo.createMessage({ conversationId, senderId, content, attachments });
+    await notificationsService.notifyDirectMessage(
+      conversationId,
+      senderId,
+      conv.participantIds,
+      content
+    );
     return message;
   },
 

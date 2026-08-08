@@ -15,116 +15,121 @@ import ClubsPage from "./clubs/ClubsPage";
 import ClubDetailPage from "./clubs/ClubDetailPage";
 import ConversationList from "./messaging/ConversationList";
 import ChatPage from "./messaging/ChatPage";
+import NotificationsPage from "../modules/notifications/NotificationsPage";
+import AppLayout from "../shared/layouts/AppLayout";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <LandingPage />,
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />,
-  },
-  {
-    path: "/dashboard",
-    element: (
-      <ProtectedRoute>
-        <DashboardPage />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/profile",
-    element: (
-      <ProtectedRoute>
-        <ProfilePage />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/search",
-    element: <SearchPage />,
-  },
-
-  {
-    path: "/books/:id",
-    element: <BookDetailPage />,
-  },
-
-  {
-    path: "/library",
-    element: (
-      <ProtectedRoute>
-        <LibraryPage />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/bookshelves",
-    element: (
-      <ProtectedRoute>
-        <BookshelvesPage />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/bookshelves/:id",
-    element: (
-      <ProtectedRoute>
-        <BookshelfDetailPage />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/readers",
-    element: (
-      <ProtectedRoute>
-        <DiscoverReadersPage />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/clubs",
-    element: (
-      <ProtectedRoute>
-        <ClubsPage />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/clubs/:id",
-    element: (
-      <ProtectedRoute>
-        <ClubDetailPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/messages",
-    element: (
-      <ProtectedRoute>
-        <ConversationList />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/messages/:id",
-    element: (
-      <ProtectedRoute>
-        <ChatPage />
-      </ProtectedRoute>
-    ),
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <LandingPage />,
+      },
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/notifications",
+        element: (
+          <ProtectedRoute>
+            <NotificationsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/search",
+        element: <SearchPage />,
+      },
+      {
+        path: "/books/:id",
+        element: <BookDetailPage />,
+      },
+      {
+        path: "/library",
+        element: (
+          <ProtectedRoute>
+            <LibraryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/bookshelves",
+        element: (
+          <ProtectedRoute>
+            <BookshelvesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/bookshelves/:id",
+        element: (
+          <ProtectedRoute>
+            <BookshelfDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/readers",
+        element: (
+          <ProtectedRoute>
+            <DiscoverReadersPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/clubs",
+        element: (
+          <ProtectedRoute>
+            <ClubsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/clubs/:id",
+        element: (
+          <ProtectedRoute>
+            <ClubDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/messages",
+        element: (
+          <ProtectedRoute>
+            <ConversationList />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/messages/:id",
+        element: (
+          <ProtectedRoute>
+            <ChatPage />
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
 ]);

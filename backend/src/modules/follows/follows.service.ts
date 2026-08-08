@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { followsRepository } from "./follows.repository.js";
 import { usersRepository } from "../users/users.repository.js";
 import { ErrorFactory } from "../../shared/errors/ErrorFactory.js";
+import { notificationsService } from "../notifications/notifications.service.js";
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,9 @@ export const followsService = {
       throw ErrorFactory.validation("You are already following this user.");
     }
 
-    return followsRepository.create(followerId, followingId);
+    const relation = await followsRepository.create(followerId, followingId);
+    await notificationsService.notifyNewFollower(followerId, followingId);
+    return relation;
   },
 
   unfollow: async (followerId: string, followingId: string) => {

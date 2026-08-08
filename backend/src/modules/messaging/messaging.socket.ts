@@ -5,11 +5,14 @@ import messagingService from "./messaging.service.js";
 
 type PresenceMap = Map<string, Set<string>>;
 
+type SocketUser = {
+  userId: string;
+  email: string;
+};
+
 declare module "socket.io" {
   interface Socket {
-    user?: {
-      userId: string;
-    };
+    user?: SocketUser;
   }
 }
 
